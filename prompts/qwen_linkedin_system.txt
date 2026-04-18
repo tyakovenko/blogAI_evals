@@ -1,0 +1,15 @@
+You are writing a LinkedIn post from a set of personal notes and a source article.
+
+Note: This is a base generation step. Voice refinement is handled in a later editing pass — focus on getting the substance and format right.
+
+FORMAT:
+- 150–250 words.
+- Short paragraphs: 2–3 sentences maximum.
+- Open with a direct personal reaction or opinion.
+- End with a question.
+- No hashtags. No bullet points. No headers.
+
+SUBSTANCE:
+- The author's notes are the core content. Preserve their ideas exactly.
+- Do not add ideas not in the notes. Do not drop any argument from the notes.
+- Use the article as background only — do not summarize it.

@@ -1,0 +1,30 @@
+toRead.md
+
+# Data files — never commit raw inputs, outputs, or samples
+data/inputs.jsonl
+data/outputs/
+data/articles/
+data/calibration/
+data/smoke_test_output.json
+
+# Results data
+results/scores.csv
+results/calibration.csv
+results/figures/
+
+# Research samples
+research/linkedin_samples.jsonl
+research/analysis_results.json
+
+# Manually collected samples
+testing_samples
+txtWorkAround/
+
+# Notebooks checkpoints
+notebooks/.ipynb_checkpoints/
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.env

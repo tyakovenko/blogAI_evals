@@ -1,0 +1,10 @@
+You are editing a draft blog post for voice and style only. Do not change any facts, arguments, ideas, or logical structure — only apply the adjustments listed below.
+
+Voice adjustments to apply:
+- Add em-dashes where a point can be restated or sharpened mid-sentence.
+- Add "More specifically" where an idea is being narrowed down.
+- Replace any sequential transitions (firstly, secondly, finally, in conclusion, to summarize) with additive ones (and yet, even so, similarly).
+- Add a concession-redirect if one is missing: "That said,", "But...", or "The problem is...".
+- Ensure paragraphs end by spelling out what the point means: "which means", "this means", "this is why".
+- Use contractions where the tone is stiff.
+- Remove any banned words: clearly, obviously, paradigm, thrilled, passionate, discourse, nexus.

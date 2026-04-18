@@ -1,117 +1,256 @@
 # blogAI_evals — Study 2: Substance & Voice Fidelity Under Mode Transformation
 
+> **Scope note:** This plan covers the two models currently functional on HF free tier — Qwen and Haiku. Gemma and Mistral fail silently on the serverless API and fall back to Haiku in production (confirmed 2026-04-14). When those models are connected, the full 4-model comparison plan is in `README_full_plan.md` — the eval logic here applies directly, just add conditions.
+
+---
+
 ## Research Question
 
-When an LLM transforms user notes into mode-appropriate content (blog post, LinkedIn post), does it preserve the user's intellectual substance and voice — and which model configuration best maintains that fidelity under mode transformation?
-
-## What This Study Is Not
-
-This is not a summarization study. The article is not the primary source of content — the user's notes are. The article enters the evaluation through one question only: did the model fabricate something that contradicts the source? That is a floor constraint (hallucination check), not a scored dimension.
+When an LLM transforms user notes into mode-appropriate content (blog post, LinkedIn post), does it preserve the user's intellectual substance and voice — and is the Qwen→Haiku pipeline competitive with Haiku generating from scratch?
 
 ## What This Study Is
 
-An evaluation of LLMs as **thought amplifiers** — tools that reformat existing ideas into new modes without distorting or replacing them. The core tension: mode adaptation (making output blog- or LinkedIn-appropriate) vs. substance preservation (keeping the user's actual argument intact).
+An evaluation of LLMs as **thought amplifiers** — tools that reformat existing ideas into new modes without distorting or replacing them. The core tension: mode adaptation vs. substance preservation.
+
+The primary comparison: **`qwen_haiku` vs. `haiku`** — pipeline vs. standalone on quality and cost.
 
 ---
 
 ## Conditions
 
-Same 3-way comparison as Study 1, same inputs:
+3 conditions × 2 modes × 30 inputs = **180 outputs** (plus 60 intermediate pre-edit outputs)
 
-| Label | Description |
-|---|---|
-| `qwen_raw` | Qwen 2.5 7B, mode-appropriate style prompt, no edit |
-| `haiku_only` | Claude Haiku, same prompt, standalone |
-| `qwen_haiku` | Qwen raw → Claude Haiku edit pass |
+| Condition | Description | Purpose |
+|---|---|---|
+| `qwen` | Qwen 2.5 7B standalone, no edit | Baseline — what the pipeline starts from |
+| `haiku` | Claude Haiku standalone | Comparison target |
+| `qwen_haiku` | Qwen output → Haiku edit pass | Primary condition |
 
-Two output modes tested per sample:
-- `blog` — analytical blog post register
-- `linkedin` — social/professional register
+**Intermediate capture:** For `qwen_haiku`, Qwen's raw output is saved before the Haiku edit and scored independently. This enables delta analysis — what did the edit add, and what did it damage?
 
-This gives 6 output files total (3 conditions × 2 modes).
+**The three comparisons this enables:**
+- `qwen_haiku` vs. `haiku` — is the pipeline competitive with Haiku standalone?
+- `qwen` vs. `qwen_haiku` — what does the Haiku edit actually contribute?
+- `qwen` vs. `haiku` — raw capability gap between the two models
 
 ---
 
 ## Inputs
 
-**Target:** 30–50 samples. Same inputs.jsonl schema as Study 1.
+30 samples. Schema:
 
 ```json
 {
   "id": "sample_001",
   "article_url": "https://...",
-  "article_text": "...",
   "notes": "...",
   "domain": "tech",
-  "mode": "blog"
+  "note_complexity": null
 }
 ```
 
-Each sample has a designated mode. Aim for ~60% blog, ~40% linkedin to reflect realistic usage.
+`article_text` is fetched at generation time and stored in the output record — not in inputs. `note_complexity` is computed before generation and written back in-place. Min 3 domains.
+
+---
+
+## Calibration Set
+
+5 gold standard outputs and 5 null baseline outputs. Establishes metric ceilings and floors before any model evaluation. Stored in `data/calibration/`.
+
+**Gold standard:** Haiku generates standalone blog + LinkedIn posts for samples 001–005 using the frozen prompts. Taya edits those outputs directly — corrections to voice, substance, and structure become the gold standard. This reflects the actual workflow (Taya edits, not writes from scratch) and avoids circular comparison: the gold standard base is Haiku standalone, which is one of the test conditions but not the primary one (`qwen_haiku` is).
+
+**Null baseline:** Article summary only — notes are ignored entirely. Establishes the floor: a model that reads the article but ignores the user's voice.
+
+A metric that doesn't separate the null baseline from any model condition is not discriminating and must be revised before results are interpreted.
 
 ---
 
 ## Metrics
 
-### Primary Metric 1 — Substance Fidelity
-**Question:** Do the user's ideas from the notes actually appear in the output, or did the model replace them with article summary?
+### Primary Metric 1 — Substance Fidelity (Argument-Level)
 
-**Implementation:**
-- Embed `notes` and `output` using `sentence-transformers` (`all-mpnet-base-v2` — stronger than MiniLM for semantic precision)
-- Segment notes into individual claims (split on newlines / sentence boundaries)
-- For each claim, compute cosine similarity against all output sentences
-- Score = mean of per-claim max similarities
-- Flag samples where score < 0.5 as "substance replaced" — inspect manually
+Decompose each note into typed components, embed with `sentence-transformers` (`all-mpnet-base-v2`), score each against the output.
 
-**What low scores mean:** The model summarized the article instead of amplifying the notes. This is the primary failure mode.
+**Component detection (keyword pattern matching):**
 
-### Primary Metric 2 — Voice Fidelity
-**Question:** Does the output exhibit the linguistic fingerprint documented in the taya-voice skill?
+| Type | Detection rule |
+|---|---|
+| `logic` | Contains: `"because"`, `"which means"`, `"this is why"`, `"as a result"`, `"therefore"` |
+| `implication` | Contains: `"the implication"`, `"this means"`, `"which is why"`, `"so the"`, `"meaning that"` |
+| `evidence` | Contains: `"for example"`, `"for instance"`, `"such as"`, `"like when"` |
+| `claim` | Default — matches none of the above |
 
-Voice is operationalized as a scored rubric, not a subjective judgment. Scored separately per mode (blog register vs. analytical register have different expected features).
+Report per-type scores and aggregate. **Flattening flag:** `claim` ≥ 0.6 AND (`logic` + `implication`) / 2 < 0.4 — model kept the topic, stripped the reasoning.
 
-**Blog mode rubric (0–1, each item binary):**
-- No bullet points in body prose
-- No markdown headers
-- Contractions present (`it's`, `I'd`, `that's`)
-- Direct address (`you`) present
-- Ends with open question or thread (not a conclusion statement)
-- Opinions stated before unpacking (not thesis-last)
-- No `"clearly"`, `"obviously"`, `"paradigm"`, `"thrilled"` present
+**Claim-type tagging** (separate from component type):
 
-**Analytical/blog post rubric (0–1, each item binary):**
-- No bullet points in analytical prose
-- Em-dash restatement present at least once
-- `"More specifically"` present at least once
-- Thesis does not appear in sentence 1
-- Hedging words present in body (`"I think"`, `"I believe"`, `"might"`, `"seems"`)
-- No sequential transitions (`"First"`, `"Second"`, `"Finally"`)
-- Every paragraph has an implication (last sentence is consequence, not noun phrase)
+| Claim type | Detection |
+|---|---|
+| `question` | Ends with `?` |
+| `connection` | Matches logic keywords |
+| `opinion` | Contains: `"I think"`, `"I believe"`, `"seems"`, `"arguably"` |
+| `fact` | Default |
 
-Score = items passing / total items per mode rubric.
+### Primary Metric 2 — Voice Fidelity (Two-Tier)
 
-**Implementation:** Regex + spaCy for sentence-level detection. No LLM-as-judge — rules are precise enough to automate.
+**Tier 1 — Surface markers** (easy to mimic): em-dash present, `"More specifically"` present, contractions present, no banned words (`"clearly"`, `"obviously"`, `"paradigm"`, `"thrilled"`), no sequential transitions, no bullet points, no markdown headers.
+
+**Tier 2 — Structural patterns** (hard to mimic): example-before-generalization ordering (spaCy), subordinate clause ratio above threshold (spaCy dependency parse), additive transitions present (`ADDITIVE_TRANSITIONS` list), concession-redirect present, paragraphs end on implication (explicit consequence markers only — not `\bwhich\b`).
+
+Report Tier 1, Tier 2, and delta separately. The T1−T2 delta is a finding: high T1, low T2 = surface mimicry without structural voice.
+
+Mode-specific rubrics: `score_blog()` and `score_linkedin()` are distinct.
+
+**Validation gate:** Score 10 calibration samples through rubric + manually. Spearman ρ ≥ 0.5 required before full study runs.
+
+### Note Complexity Stratification
+
+`complexity = (number of claims) × (mean claim length) × (1 + has_connecting_logic)`
+
+Stratify by tercile: simple / moderate / complex. Written back to `inputs.jsonl` before generation.
 
 ### Floor Constraint — Factual Consistency
-**Question:** Does the output contradict the article?
 
-**Implementation:** Same as Study 1 — NLI via `roberta-large-mnli`. Output sentences scored for entailment against article text. Flag outputs with > 20% contradiction rate for manual review. Not included in primary scoring.
+BM25 retrieval (`rank_bm25`) per output sentence → top-3 article passages → NLI via `roberta-large-mnli`. Replaces truncation approach. Flag outputs with > 20% contradiction rate. Not in primary scoring.
 
 ---
 
-## The Core Tradeoff Visualization
+## Cost Tracking (Haiku Only)
 
-For each condition, plot each sample as a point in 2D space:
-- X axis: Substance Fidelity score
-- Y axis: Voice Fidelity score
+Qwen is free tier — no cost tracking needed.
 
-The shape of the point cloud per condition is the finding:
-- Clustered top-right: model preserves both
-- Scattered: inconsistent
-- Top-left: voice present, substance lost (model rewrote the argument)
-- Bottom-right: substance present, voice absent (model preserved ideas, ignored style)
+Log on every Haiku call, whether standalone generation (`haiku` condition) or edit pass (`qwen_haiku` condition):
 
-The tradeoff question: does mode adaptation (blog vs. linkedin) shift the distribution? Do models that score well on voice sacrifice substance?
+```json
+{
+  "id": "sample_001",
+  "condition": "haiku",
+  "mode": "blog",
+  "input_tokens": 1306,
+  "output_tokens": 510,
+  "estimated_cost_usd": 0.000964,
+  "latency_ms": 7461,
+  "edit_scope": null
+}
+```
+
+`edit_scope` is null for standalone Haiku and populated for `qwen_haiku` edit pass calls:
+
+```
+edit_scope = (sentences added + sentences removed) / total sentences in pre-edit output
+```
+
+Near 0 = light polish. Near 1 = near-complete rewrite. High edit scope + substance drop = Haiku overwrote the argument while fixing voice.
+
+**The cost comparison:**
+- `haiku` standalone: full generation tokens per sample
+- `qwen_haiku`: edit pass tokens only — input is Qwen's output + edit prompt, shorter than full generation
+
+At 30 samples × 2 modes, expected total Haiku cost is under $0.10 for the full study.
+
+---
+
+## Prompts
+
+Blog and LinkedIn prompts live in `prompts/`. Haiku and Qwen share prompt structure — separate files per model per mode. Edit prompts are eval-specific (not in blogAI).
+
+```
+prompts/
+├── haiku_blog_system.txt
+├── haiku_blog_user.txt
+├── haiku_linkedin_system.txt
+├── haiku_linkedin_user.txt
+├── qwen_blog_system.txt
+├── qwen_blog_user.txt
+├── qwen_linkedin_system.txt
+├── qwen_linkedin_user.txt
+├── haiku_edit_blog_system.txt
+└── haiku_edit_blog_user.txt    # {output} = Qwen's draft
+└── haiku_edit_linkedin_system.txt
+└── haiku_edit_linkedin_user.txt
+```
+
+**Edit prompt constraint:** Same instructions for every post within a mode — only `{output}` changes. If a post needs changes beyond what the prompt specifies, fix the prompt, not the post. Changing the edit prompt invalidates prior `qwen_haiku` results.
+
+**Haiku generation prompt freeze:** `haiku_blog_*.txt` and `haiku_linkedin_*.txt` are frozen after rubric validation. These produce the standalone Haiku outputs used as the comparison baseline — any change breaks that comparison.
+
+---
+
+## Output Schema
+
+Both `scores.csv` columns and per-condition JSONL output files:
+
+**Output JSONL per condition/mode** (`data/outputs/qwen_blog.jsonl`, etc.):
+
+```json
+{
+  "id": "sample_001",
+  "article_text": "...",
+  "output": "...",
+  "input_tokens": null,
+  "output_tokens": null,
+  "estimated_cost_usd": null,
+  "latency_ms": 1200
+}
+```
+
+Haiku files have token fields populated; Qwen files have nulls.
+
+**`results/scores.csv` columns:**
+
+| Column | Description |
+|---|---|
+| `id` | Sample ID |
+| `condition` | `qwen`, `haiku`, `qwen_haiku`, `qwen_pre_edit` |
+| `mode` | `blog` or `linkedin` |
+| `domain` | From inputs |
+| `note_complexity` | Computed score |
+| `complexity_tier` | `simple`, `moderate`, `complex` |
+| `substance_aggregate` | Mean across all components |
+| `substance_claim` | Per-type mean score |
+| `substance_evidence` | Per-type mean score |
+| `substance_logic` | Per-type mean score |
+| `substance_implication` | Per-type mean score |
+| `substance_flagged` | 1 if aggregate < 0.5 |
+| `flattening_flagged` | 1 if claim ≥ 0.6 and (logic+implication)/2 < 0.4 |
+| `claimtype_opinion_score` | Mean substance score for opinion components |
+| `claimtype_fact_score` | Mean substance score for fact components |
+| `claimtype_connection_score` | Mean substance score for connection components |
+| `voice_tier1` | Tier 1 score |
+| `voice_tier2` | Tier 2 score |
+| `voice_combined` | (tier1 + tier2) / 2 |
+| `voice_delta` | tier1 − tier2 |
+| `contradiction_rate` | Fraction of output sentences flagged |
+| `contradiction_flagged` | 1 if rate > 0.20 |
+| `edit_scope` | `qwen_haiku` only — sentence change rate vs. pre-edit |
+| `haiku_input_tokens` | Haiku conditions only |
+| `haiku_output_tokens` | Haiku conditions only |
+| `haiku_cost_usd` | Haiku conditions only |
+| `latency_ms` | Generation latency |
+
+---
+
+## Statistical Tests
+
+- **Primary comparison:** Wilcoxon signed-rank (paired) — `qwen_haiku` vs. `haiku`, same inputs
+- **Mode comparison:** Wilcoxon signed-rank (paired, within-subjects) — blog vs. LinkedIn per condition
+- **Edit contribution:** Wilcoxon signed-rank — `qwen` vs. `qwen_haiku`, same inputs
+- **Effect size:** rank-biserial correlation
+- α = 0.05
+- **Power note:** N=30 requires d > 0.7 for significance. Flag underpowered tests — non-significance is not a null finding.
+
+---
+
+## Visualizations
+
+**Primary:** 2D scatter per condition — X: substance aggregate, Y: voice combined. Calibration band overlaid (gold standard ceiling, null baseline floor).
+
+**Secondary:**
+- Tier 1 vs. Tier 2 per condition — surface mimicry gap
+- Substance by component type — which components survive per condition
+- `qwen` → `qwen_pre_edit` → `qwen_haiku` delta — what the edit actually changes
+- Edit scope vs. substance delta scatter — does heavy editing cause substance loss?
+- Cost: `haiku` generation tokens vs. `qwen_haiku` edit tokens per sample
 
 ---
 
@@ -119,63 +258,106 @@ The tradeoff question: does mode adaptation (blog vs. linkedin) shift the distri
 
 ```
 blogAI_evals/
-├── README.md
+├── README.md                           # this plan (Qwen + Haiku)
+├── README_full_plan.md                 # backup — 4-model plan for when Gemma/Mistral are connected
+├── v2.md                               # original critical review — do not delete
 ├── requirements.txt
+├── .env                                # ANTHROPIC_API_KEY, HF_TOKEN
+├── .env.example
+├── prompts/
+│   ├── haiku_blog_system.txt
+│   ├── haiku_blog_user.txt
+│   ├── haiku_linkedin_system.txt
+│   ├── haiku_linkedin_user.txt
+│   ├── qwen_blog_system.txt
+│   ├── qwen_blog_user.txt
+│   ├── qwen_linkedin_system.txt
+│   ├── qwen_linkedin_user.txt
+│   ├── haiku_edit_blog_system.txt
+│   ├── haiku_edit_blog_user.txt
+│   ├── haiku_edit_linkedin_system.txt
+│   └── haiku_edit_linkedin_user.txt
 ├── data/
 │   ├── inputs.jsonl
+│   ├── calibration/
+│   │   ├── gold_standard.jsonl
+│   │   └── null_baseline.jsonl
 │   └── outputs/
-│       ├── qwen_raw_blog.jsonl
-│       ├── qwen_raw_linkedin.jsonl
-│       ├── haiku_only_blog.jsonl
-│       ├── haiku_only_linkedin.jsonl
+│       ├── qwen_blog.jsonl
+│       ├── qwen_linkedin.jsonl
+│       ├── haiku_blog.jsonl
+│       ├── haiku_linkedin.jsonl
+│       ├── qwen_pre_edit_blog.jsonl
+│       ├── qwen_pre_edit_linkedin.jsonl
 │       ├── qwen_haiku_blog.jsonl
 │       └── qwen_haiku_linkedin.jsonl
+├── scripts/
+│   ├── generate.py                     # runs all 3 conditions × 2 modes
+│   └── test_call.py                    # smoke test — single sample, all conditions
 ├── eval/
-│   ├── substance_fidelity.py     # sentence-transformers claim matching
-│   ├── voice_rubric.py           # regex + spaCy voice fingerprint scorer
-│   ├── factual_consistency.py    # NLI hallucination floor check
-│   └── run_all.py                # → results/scores.csv
+│   ├── substance_fidelity.py
+│   ├── voice_rubric.py
+│   ├── factual_consistency.py
+│   ├── note_complexity.py
+│   ├── cost_tracker.py
+│   └── run_all.py
+├── research/
+│   ├── scraper.py
+│   ├── analyze.py
+│   └── linkedin_formatter.py
 ├── notebooks/
-│   ├── 01_generate.ipynb         # Colab — 3 conditions × 2 modes
-│   ├── 02_evaluate.ipynb         # runs full eval pipeline
-│   └── 03_analysis.ipynb         # 2D tradeoff plots, per-mode breakdowns
+│   ├── 01_analysis.ipynb               # 2D plots, per-mode breakdowns, stats
+│   └── 02_calibration.ipynb            # gold standard + null baseline scoring
 └── results/
-    └── scores.csv                # condition × mode × metric × sample_id
+    ├── scores.csv
+    └── calibration.csv
 ```
 
 ---
 
 ## Execution Sequence
 
-1. **Collect inputs** — 30–50 real BlogAI runs, logged to `data/inputs.jsonl`. Same dataset as Study 1 where possible (enables cross-study comparison).
-2. **Run `01_generate.ipynb`** on Colab — generates all 6 output files
-3. **Run `02_evaluate.ipynb`** — substance fidelity, voice rubric, hallucination check → `results/scores.csv`
-4. **Run `03_analysis.ipynb`** — 2D scatter plots per condition, per-mode breakdown, Wilcoxon tests on primary metrics
-5. **Manual review** — inspect flagged samples (substance score < 0.5 or hallucination rate > 20%)
+### Setup
+1. Fix `voice_rubric.py` — wire `ADDITIVE_TRANSITIONS`, fix `_paragraphs_end_on_consequence`
+2. Write Qwen prompt files (`prompts/qwen_*.txt`) — test against Qwen outputs
+3. Write edit prompt files (`prompts/haiku_edit_*.txt`)
+4. Produce calibration set (5 gold standard + 5 null baseline)
+5. **Rubric validation gate** — 10 calibration samples scored by rubric + manually, Spearman ρ ≥ 0.5
+6. Run `02_calibration.ipynb` → `results/calibration.csv`
+7. **Freeze Haiku generation prompts** after validation
+
+### Data Collection
+8. Collect 30 inputs → `data/inputs.jsonl` (min 3 domains)
+9. Run `eval/note_complexity.py` → populates `note_complexity` in `inputs.jsonl`
+
+### Generation
+10. Run `scripts/generate.py` — 3 conditions × 2 modes × 30 inputs = 180 outputs + 60 pre-edit intermediates
+
+### Evaluation
+11. Run `eval/run_all.py` → `results/scores.csv`
+12. Manual review — flagged samples (substance < 0.5 or contradiction > 20% or edit scope > 0.8)
+
+### Analysis
+13. Run `notebooks/01_analysis.ipynb` — all plots and stats
 
 ---
 
-## Statistical Tests
+## What This Study Answers
 
-- **Wilcoxon signed-rank** (paired, non-parametric) per metric per condition pair
-- **Effect size:** rank-biserial correlation
-- **Mode comparison:** Mann-Whitney U between blog and linkedin distributions per condition
-- α = 0.05
-
----
-
-## Expected Findings
-
-The mode comparison (blog vs. linkedin) is likely to be the most interesting axis:
-- LinkedIn mode may pressure models toward generic professional tone, killing voice
-- Blog mode may allow more latitude, preserving more of both substance and voice
-- Qwen's style failures (documented in findings.md) predict low voice scores in both modes
-- The Haiku edit pass hypothesis: fixes voice, unknown effect on substance — this is the open question
-
-If substance scores diverge between `haiku_only` and `qwen_haiku` at similar voice scores, the finding is: the pipeline adds voice without recovering substance. That would suggest the Qwen generation step is already losing the notes before Haiku sees the output.
+| Question | How |
+|---|---|
+| Is `qwen_haiku` competitive with `haiku` standalone? | Primary paired comparison |
+| Does the edit pass improve on Qwen alone? | `qwen` vs. `qwen_haiku` paired |
+| At what cost difference? | Haiku edit tokens vs. full generation tokens |
+| Does mode (blog vs. LinkedIn) shift the tradeoff? | Within-subjects, paired across modes |
+| Which argument components are lost per condition? | Component-level substance breakdown |
+| Is voice real or surface mimicry? | Tier 1 vs. Tier 2 delta |
+| Where in the pipeline does loss occur? | `qwen_pre_edit` intermediate scoring |
+| Does heavy editing cause substance loss? | Edit scope vs. substance delta |
+| Does note complexity predict failure? | Complexity stratification |
 
 ---
 
 ## Relationship to Study 1
 
-Study 1 (in blogAI repo) tests whether the edit pass fixes a known engineering failure (style constraints). Study 2 tests whether any configuration solves the harder problem: preserving user thought under transformation. The datasets overlap by design — cross-study comparison is intentional.
+Study 1 tests whether the edit pass fixes a known engineering failure (style constraints). Study 2 tests whether any configuration preserves user thought under transformation. Datasets overlap by design.

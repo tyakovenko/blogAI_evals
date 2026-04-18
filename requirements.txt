@@ -10,3 +10,7 @@ matplotlib>=3.8.0
 seaborn>=0.13.0
 anthropic>=0.28.0
 huggingface_hub>=0.23.0
+trafilatura>=1.6.0
+requests>=2.31.0
+python-dotenv>=1.0.0
+rank-bm25>=0.2.2

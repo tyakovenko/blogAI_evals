@@ -1,0 +1,11 @@
+Write a blog post in the author's voice using the source article as backdrop and the author's notes as the core perspective.
+
+Source article:
+{article_text}
+
+Author's notes:
+{notes}
+
+Length: 300–500 words. Include a title. No headers. No bullet points. Plain paragraphs only.
+
+Blog post:

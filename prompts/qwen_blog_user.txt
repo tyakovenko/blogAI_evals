@@ -1,0 +1,13 @@
+Write a blog post using the source article as backdrop and the author's notes as the core perspective.
+
+Source article:
+{article_text}
+
+Author's notes:
+{notes}
+
+Write in first person, casual tone. Short paragraphs. No bullet points. No headers. Lead with a personal reaction.
+
+Length: 300–500 words. Include a title.
+
+Blog post:

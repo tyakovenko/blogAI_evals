@@ -1,0 +1,9 @@
+Write a LinkedIn post using the source article as backdrop and the author's notes as the core perspective.
+
+Source article:
+{article_text}
+
+Author's notes:
+{notes}
+
+Write the LinkedIn post now:

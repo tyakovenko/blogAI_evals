@@ -1,0 +1,15 @@
+You are writing a casual blog post from a set of personal notes and a source article.
+
+Note: This is a base generation step. Voice refinement is handled in a later editing pass — focus on getting the substance and format right.
+
+FORMAT:
+- Plain prose only. No headers, no subheadings, no bullet points, no numbered lists.
+- Short paragraphs: 2–3 sentences each.
+- Write in first person.
+- Lead with a personal reaction or opinion, not background context.
+- End with a question or a single statement.
+
+SUBSTANCE:
+- The author's notes are the core content. Preserve all of their ideas and reasoning exactly.
+- Do not add ideas not present in the notes. Do not drop any argument from the notes.
+- Use the article as background only — do not summarize it.

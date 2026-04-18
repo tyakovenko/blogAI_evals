@@ -1,17 +1,22 @@
 """
 Factual Consistency — Hallucination Floor Check
 Checks whether the output contradicts the source article.
-This is a pass/fail floor constraint, not a primary metric.
+Floor constraint only — not a primary metric.
 
-Method: NLI (roberta-large-mnli) — for each output sentence, check
-entailment against the article. Flag outputs with >20% contradiction rate.
+Method: for each output sentence, retrieve top-3 most relevant article
+passages via BM25, then run NLI (roberta-large-mnli) against each.
+Replaces the original 1500-char truncation approach which created bias
+against content later in the article.
 """
 
-from transformers import pipeline
 import re
+from transformers import pipeline
+from rank_bm25 import BM25Okapi
 
-NLI_MODEL = "roberta-large-mnli"
+NLI_MODEL              = "cross-encoder/nli-deberta-v3-small"
 CONTRADICTION_THRESHOLD = 0.20
+TOP_K_PASSAGES          = 3
+MIN_PASSAGE_WORDS       = 10
 
 _pipe = None
 
@@ -27,9 +32,20 @@ def _split_sentences(text: str) -> list[str]:
     return [s.strip() for s in re.split(r"(?<=[.!?])\s+", text) if len(s.strip()) > 15]
 
 
-def _truncate(text: str, max_chars: int = 400) -> str:
-    """Truncate to fit NLI model token limits."""
-    return text[:max_chars]
+def _split_passages(article_text: str) -> list[str]:
+    """Split article into sentence-level passages for BM25 indexing."""
+    return _split_sentences(article_text)
+
+
+def _tokenize(text: str) -> list[str]:
+    return re.findall(r"\b\w+\b", text.lower())
+
+
+def _retrieve_passages(query: str, passages: list[str], bm25: BM25Okapi) -> list[str]:
+    """Return top-K most relevant article passages for a query sentence."""
+    scores  = bm25.get_scores(_tokenize(query))
+    top_idx = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:TOP_K_PASSAGES]
+    return [passages[i] for i in top_idx if len(passages[i].split()) >= MIN_PASSAGE_WORDS]
 
 
 def score(article_text: str, output: str) -> dict:
@@ -38,39 +54,50 @@ def score(article_text: str, output: str) -> dict:
 
     Returns:
         {
-            "contradiction_rate": float,  # fraction of sentences flagged
-            "flagged": bool,              # True if rate > threshold
-            "n_sentences": int,
-            "contradicted": list[str]     # sentences flagged for review
+            contradiction_rate: float,
+            flagged: bool,
+            n_sentences: int,
+            contradicted: list[str],
         }
     """
-    pipe = _get_pipe()
+    pipe             = _get_pipe()
     output_sentences = _split_sentences(output)
+    article_passages = _split_passages(article_text)
 
-    if not output_sentences:
+    if not output_sentences or not article_passages:
         return {"contradiction_rate": 0.0, "flagged": False,
                 "n_sentences": 0, "contradicted": []}
 
-    # Use first 1500 chars of article as premise (NLI token limit)
-    article_premise = _truncate(article_text, 1500)
-    contradicted = []
+    # Build BM25 index over article passages
+    tokenized_passages = [_tokenize(p) for p in article_passages]
+    bm25               = BM25Okapi(tokenized_passages)
 
+    contradicted = []
     for sentence in output_sentences:
-        # NLI input: premise = article snippet, hypothesis = output sentence
-        result = pipe(
-            f"{article_premise} [SEP] {_truncate(sentence, 200)}",
-            truncation=True,
-            max_length=512,
-        )
-        label = result[0]["label"].lower()
-        if label == "contradiction":
+        top_passages = _retrieve_passages(sentence, article_passages, bm25)
+        if not top_passages:
+            continue
+
+        # Score sentence against each retrieved passage, take the most charitable
+        # (lowest contradiction score) — we want to flag only clear contradictions
+        is_contradiction = False
+        for passage in top_passages:
+            result = pipe(
+                f"{passage} [SEP] {sentence}",
+                truncation=True,
+                max_length=512,
+            )
+            if result[0]["label"].lower() == "contradiction":
+                is_contradiction = True
+                break  # one clear contradiction is enough to flag the sentence
+
+        if is_contradiction:
             contradicted.append(sentence)
 
     rate = len(contradicted) / len(output_sentences)
-
     return {
         "contradiction_rate": round(rate, 4),
-        "flagged": rate > CONTRADICTION_THRESHOLD,
-        "n_sentences": len(output_sentences),
-        "contradicted": contradicted,
+        "flagged":            rate > CONTRADICTION_THRESHOLD,
+        "n_sentences":        len(output_sentences),
+        "contradicted":       contradicted,
     }

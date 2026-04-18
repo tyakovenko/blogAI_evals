@@ -1,0 +1,6 @@
+Edit the following blog post for voice and style only. Do not change any facts, arguments, or logical structure.
+
+Post:
+{output}
+
+Edited post:

@@ -1,0 +1,92 @@
+# 50 curated blog URLs for platform style research
+# Domain: AI, consciousness, neuroscience, philosophy, tech research
+# Mix of research institutions, publications, and personal essays
+# Lines starting with # are ignored
+
+# Research Institution Blogs
+https://bair.berkeley.edu/blog/
+https://openai.com/news/
+https://www.anthropic.com/news
+https://ai.meta.com/blog/
+
+# Tech & AI Analysis
+https://www.theverge.com/ai-artificial-intelligence
+https://www.theinformation.com/briefings/ai
+https://techcrunch.com/category/artificial-intelligence/
+https://www.wired.com/tag/artificial-intelligence/
+
+# Academic Platforms & Publications
+https://arxiv.org/
+https://openreview.net/
+https://neurosciencenews.com/
+
+# Neuroscience & Cognitive Science Society Blogs
+https://www.cogneurosociety.org/cns-blog/
+https://cognitivesciencesociety.org/blog/
+https://www.simplyneuroscience.org/blog
+https://philosophyofbrains.com/category/neuroscience
+
+# Data Science & ML Platforms
+https://towardsdatascience.com/
+https://towardsai.net/
+https://www.kdnuggets.com/
+https://machinelearningmastery.com/
+
+# Philosophy & Consciousness
+https://dailynous.com/
+https://leiterreports.typepad.com/
+https://www.3ammagazine.com/
+https://philosophyofscience.org/
+
+# Personal Essays & Analysis (Tech/AI)
+https://paulgraham.com/
+https://www.overcomingbias.com/
+https://www.ribbonfarm.com/
+https://slatestarcodex.com/
+https://www.astralcodexten.com/
+
+# Research & Theory Blogs
+https://www.scottaaronson.com/blog/
+https://lesswrong.com/
+https://www.gwern.net/
+https://news.ycombinator.com/
+
+# Cognitive Science & Neuroscience Publications
+https://www.nature.com/articles
+https://www.science.org/
+https://pubmed.ncbi.nlm.nih.gov/
+https://www.sciencedaily.com/
+
+# AI Safety & Alignment
+https://www.alignmentresearch.org/
+https://www.centerforsecurity.org/articles/
+https://intelligence.org/
+
+# Psychology & Behavior
+https://www.psychologytoday.com/basics
+https://www.edge.org/
+https://www.brainpickings.org/
+
+# Generalist Science & Tech Blogs
+https://arstechnica.com/science/
+https://www.anandtech.com/
+https://xkcd.com/
+https://waitbutwhy.com/
+
+# Research Summaries & Analysis
+https://markettechpost.com/
+https://analyticsindiamag.com/
+https://www.builtwith.com/articles
+https://www.smartbrief.com/topic/artificial-intelligence
+
+# Independent Research & Essays
+https://blog.kevinjahns.de/
+https://eigenvector.github.io/
+https://www.semanticscholar.org/
+https://mitsloan.mit.edu/ideas-made-to-matter
+
+# Miscellaneous High-Quality Tech/Science Writing
+https://www.quanta.org/
+https://www.simonsfoundation.org/our-focus/mathematics-and-physical-sciences/
+https://www.quantamagazine.org/
+https://www.research.google/
