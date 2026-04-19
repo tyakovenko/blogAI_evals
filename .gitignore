@@ -1,4 +1,8 @@
 toRead.md
+project-log.md
+v2.md
+README_full_plan.md
+study_history.md
 
 # Data files — never commit raw inputs, outputs, or samples
 data/inputs.jsonl
