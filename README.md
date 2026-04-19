@@ -16,7 +16,7 @@ The primary comparison: **`qwen_haiku` vs. `haiku`** — pipeline vs. standalone
 
 ## Conditions
 
-3 conditions × 2 modes × 27 inputs (3 dropped — paywalled) = **162 outputs** + 54 intermediate pre-edit outputs
+3 primary conditions × 2 modes × 27 inputs (3 dropped — paywalled) = **162 outputs** + 54 intermediate pre-edit outputs (`qwen_pre_edit`)
 
 | Condition | Description | Purpose |
 |---|---|---|
@@ -170,14 +170,22 @@ blogAI_evals/
 ├── README.md
 ├── requirements.txt
 ├── .env.example
-├── prompts/
+├── project-log.md
+├── study_history.md
+├── prompts/                          # 12 prompt files (system + user per condition × mode)
 ├── data/
-│   ├── inputs.jsonl              # gitignored
-│   ├── calibration/              # gitignored
-│   └── outputs/                  # gitignored
+│   ├── inputs.jsonl                  # gitignored
+│   ├── calibration/                  # gitignored
+│   └── outputs/                      # gitignored
 ├── scripts/
-│   ├── generate.py               # runs all conditions × modes
-│   └── test_call.py              # smoke test — single sample
+│   ├── generate.py                   # runs all conditions × modes (resumable)
+│   ├── test_call.py                  # smoke test — single sample
+│   ├── gen_gold_standard_base.py
+│   ├── gen_null_baseline.py
+│   ├── score_calibration.py
+│   ├── make_report.py
+│   ├── make_figures.py
+│   └── constants.py
 ├── eval/
 │   ├── substance_fidelity.py
 │   ├── voice_rubric.py
@@ -189,12 +197,16 @@ blogAI_evals/
 │   ├── scraper.py
 │   ├── analyze.py
 │   ├── linkedin_formatter.py
-│   └── linkedin_samples.txt      # 51 posts for LinkedIn rubric validation
+│   ├── analysis_results.json
+│   └── linkedin_samples.txt          # 51 posts for LinkedIn rubric validation
 ├── notebooks/
 │   ├── 01_analysis.ipynb
 │   └── 02_calibration.ipynb
 └── results/
-    └── report.md
+    ├── report.md
+    ├── scores.csv
+    ├── calibration.csv
+    └── figures/
 ```
 
 ---
