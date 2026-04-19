@@ -1,0 +1,1206 @@
+--- linkedin_001 ---
+
+More exciting progress as we relentlessly drive quality up and cost down. The Gemini 2.0 series are the leading models for cost and performance. With today’s releases, everyone can tap into their powerful reasoning and multimodal capabilities, which also lay the foundations for our agent research work.
+
+--- linkedin_002 ---
+
+I’ve spent my whole career working on AI because I believe it will be the ultimate tool to advance science. So I’m excited to see the US and UK Tech Prosperity Deal announced today, which highlights the opportunity for AI to accelerate scientific progress in vital areas like drug discovery and fusion energy. 
+
+Combining the unique strengths of both countries will help to ensure our scientists continue to lead on the breakthroughs and innovations that will define the future. In particular, we look forward to working with both governments to advise on how scientists can harness the latest AI tools, as well as building on our partnership with the UK Atomic Energy Authority to advance fusion energy research in the US and the UK. 
+
+Today’s agreement also deepens longstanding security collaborations between the US and UK. As we approach AGI, a strong partnership between the UK’s AI Security Institute (AISI) and the US’s Center for AI Standards and Innovation (CAISI) will be vital for ensuring and promoting secure deployment of AI throughout the world. I’d especially like to see AISI and CAISI now accelerate work on common standards, in partnership with industry.
+
+I’ve always been a proud champion of the UK’s potential to build on its rich heritage and become a global hub for pioneering AI. It’s fantastic to see continued confidence in the UK through Google’s announcement this week of a further £5 billion investment over the next two years, including a new state-of-the-art data centre at Waltham Cross. 
+
+These investments demonstrate the strength of the US-UK partnership and our commitment to ensuring both countries remain at the forefront of a new golden age of scientific discovery.
+
+--- linkedin_003 ---
+
+In 2020, AlphaFold 2 was heralded as a solution to the problem of protein structure prediction, a 50-year-old grand challenge in biology: https://dpmd.ai/3US0CdU
+
+Today, we at Google DeepMind take another big step forward with AlphaFold3, which can predict the interactions and structures of nearly all biomolecules with state-of-the-art accuracy including proteins, DNA and RNA, as well as small molecules, also known as ligands.
+
+We believe this new technology has the potential to be transformative for biological research. Isomorphic Labs is already using it to support drug design cases, together with pharmaceutical partners, and we have also created a new AlphaFold Server - powered by AlphaFold 3 - available for free for academic and non-commercial use.
+
+Millions of researchers worldwide have already leveraged existing AlphaFold tools and databases. We hope that countless more scientists will make use of AlphaFold 3 and the AlphaFold Server to accelerate their vital research in biology and medicine.
+
+--- linkedin_004 ---
+
+I wrote up a short overview of the main components behind coding agents.
+
+One thing I think is easy to overlook is that a lot of the practical performance of systems like Codex or Claude Code is not just about the underlying LLM. 
+
+The surrounding agent harness matters a lot too. It manges repo context, tool design, prompt caching, memory, context compaction, and delegation. All (can) make a real difference in practice.
+
+In the article, I discuss the six core building blocks (and use my minimalist, pure-Python Mini Coding Agent as a concrete example).
+
+If you are interested in how coding agents work under the hood, here is the link:
+https://lnkd.in/gxbyt7yT
+
+--- linkedin_005 ---
+
+It's done! All chapters of Build A Reasoning Model (From Scratch) are now available in early access.
+
+This book picks up where Build a Large Language Model (From Scratch) left off. Instead of focusing on pretraining a base model, it starts with a pretrained Qwen3 base model and then builds reasoning capabilities step by step in code:
+
+- evaluating reasoning models
+- inference-time scaling
+- self-refinement
+- reinforcement learning
+- distillation
+
+There is a lot of discussion around "reasoning" in LLMs, and I think the best way to understand what it really means in the context of LLMs is to implement one from scratch.
+
+So rather than only describing the methods at a high level, the book walks through them hands-on, ranging from how to evaluate reasoning outputs, how inference-time scaling changes behavior, how RL-based training works in practice, and how distillation can transfer reasoning traces into smaller models.
+One thing that was especially important to me is that the code stays readable and educational. 
+
+The goal was not to build the biggest or most optimized possible system, but to create something small enough to follow and still realistic enough to show how modern reasoning-model workflows are put together.
+
+I also tried to keep the main chapter code accessible. Most examples are designed around consumer hardware, and the repository includes the notebooks, scripts, and supporting materials so readers can experiment with the ideas directly.
+
+The book is currently in production and should hopefully be out in the next 1-2 months, including full-color print and syntax-highlighted code listings, yay.
+
+--- linkedin_006 ---
+
+Claude model distillation has been a big discussion topic this week. Coincidentally, I am currently writing Chapter 8, which focuses on model distillation from a practical from-scratch perspective.
+
+If you are interested in hands-on tooling rather than just high-level discussions, I shared utilities for generating distillation datasets from a wide range of open-weight models via OpenRouter and Ollama. (MiniMax M2.5, DeepSeek V3.2, GLM-5, Qwen3.5,... you name it!)
+
+GitHub link: https://lnkd.in/gRs3HK3d
+
+In short, these are just some simple tools to make it straightforward to collect teacher outputs and turn them into training/distillation data for the smaller student models (but more on that soon).
+
+--- linkedin_007 ---
+
+Ch 6 on reinforcement learning with verifiable rewards is now available. This chapter walks through GRPO from scratch, including a minimal but complete training loop with all the fun stuff: reward normalization, advantage estimation, etc.
+And no worries, I'd say it is less complicated than it sounds. It is probably my favorite chapter so far. (And with this, the first 363 pages of the book are now complete.)
+
+On a little tangent: you probably saw the clawdbot / OpenClaw developments in recent days. Essentially, it's a next-token predicting (reasoning) model combined with some looping, tool-use, orchestration, and recursion. And it's fascinating how these ingredients add up to something that is actually quite capable and quite autonomous (PS: I don't think clawdbot is taking over the world; but it's an interesting case study of how far the LLM/reasoning model can go if it is packaged up in a certain way.)
+
+More broadly, what I am trying to say is that that building methods from scratch helps us understand & appreciate the tools we rely on every day. For instance, RL with verifiable rewards is probably THE core ingredient of reasoning models and agent-style setups these days.
+
+Iam currently working on the follow-up chapter with additional RLVR runs, more detailed metrics and analyses of training dynamics, and extensions like policy ratio clipping and KL regularization. (These were intentionally left out in chapter 6 to keep the initial GRPO introduction simple, readable, and closer in spirit to REINFORCE.)
+
+--- linkedin_008 ---
+
+Efficiency and performance tweaks in the transformer architecture usually focus(ed) on the normalization, attention, and FFN modules. 
+For instance:
+
+Normalization: LayerNorm -> RMSNorm -> Dynamic TanH
+
+Attention: Grouped-query attention, sliding window, multi-head latent attention, sparse attention
+
+FFN: GeLU -> SiLU, SiLU -> SwiGLU, Mixture of Experts.
+
+Well, I just saw the New Year’s gift from DeepSeek, which includes some improvements to the residual path. 
+
+In short, it’s built on the hyper-connections (HC) approach, which generalizes the regular (identity) residual connection into a learned one by widening the residual stream via multiple parallel ones and allowing information to mix across those parallel layers.
+
+They then take the HC idea a step further and propose mHC, which constrains the residual mixing to lie on a structured, norm-preserving manifold. They found that this "m"-modification improves training stability.
+This adds a small amount of overhead, but they get much better training stability and convergence.
+
+Arxiv link to the paper: https://lnkd.in/gSSgev3r
+
+--- linkedin_009 ---
+
+There have been lots of interesting LLM releases last week. My favorite was actually the Olmo 3 release. Olmo models are always a highlight since they are fully transparent (including training methods and datasets) and come with very detailed technical reports. 
+
+I am sure I'll talk more about the interesting training-related aspects from that 100-pager in the upcoming days and weeks.
+
+In the meantime, here's the side-by-side architecture comparison with Qwen3: 
+
+1) As we can see, the Olmo 3 architecture is relatively similar to Qwen3. However, it's worth noting that this is essentially likely inspired by the Olmo 2 predecessor, not Qwen3. 
+
+2) Similar to Olmo 2, Olmo 3 still uses a post-norm flavor instead of pre-norm, as they found in the Olmo 2 paper that it stabilizes the training.
+
+3) Interestingly, the 7B model still uses multi-head attention similar to Olmo 2. 
+However, to make things more efficient and reduce the KV cache size, they now use sliding-window attention (e.g., similar to Gemma 3).
+
+Next, the 32B model (the figure is not shown here due to space reasons, but you can find it in my "The Big LLM Architecture Comparison" article or my Olmo 3 from-scratch notebook):
+
+4) Overall, it's the same architecture but just scaled up. Also, the proportions (e.g., going from the input to the intermediate size in the feed-forward layer, and so on) roughly match the ones in Qwen3. 
+
+5) My guess is the architecture was initially somewhat smaller than Qwen3 due to the smaller vocabulary, and they then scaled up the intermediate size expansion from 5x in Qwen3 to 5.4 in Olmo 3 to have a 32B model for a direct comparison. 
+
+6) Also, note that the 32B model (finally!) uses grouped query attention.
+
+
+And yes, I also did a from-scratch implementation. It was still a lot of work, but since I had already implemented Qwen3 from scratch, as well as Gemma 3 (for the sliding-window attention component), it wasn't too bad!
+
+If you are a coder, looking at the from-scratch implementation, it's probably the easiest way to understand the architecture: https://lnkd.in/gQgxtVUu
+
+--- linkedin_010 ---
+
+DeepSeek finally released a new model and paper. And because this DeepSeek-OCR release is a bit different from what everyone expected, and DeepSeek releases are generally a big deal, I wanted to do a brief explainer of what it is all about.
+
+In short, they explore how vision encoders can improve the efficiency of LLMs in processing and compressing textual information. And the takeaway is that rendering text as images and feeding that to the model results in more efficient compression than working with text directly. 
+
+My first intuition was that this sounds very inefficient and shouldn't work as well as using text tokenizers (or alternatives like Byte Latent Transformer) to prepare the input. It actually reminded me of the line of research I saw years ago, where researchers represented 3D molecules as 3D inputs or 2D images for ConvNets instead of using graph neural nets. This shouldn't work well and should be prone to overfitting.
+
+In the case of DeepSeek-OCR, why even try such an approach? I imagine it started as a curiosity, but then it may have turned into an interesting idea for long-context scaling in LLMs and how to make it cheaper by using vision tokens and representations. (An image can say more than a thousand words, but who would have thought that an image of text can say 1000 words more efficiently!)
+
+In any case, this DeepSeek-OCR approach turns out to be surprisingly efficient. In particular, they found that at a fixed precision of 97% for long-context decoding (i.e., how well the model can compress information into a latent representation and reconstruct it), the OCR version needed 10 times fewer visual tokens than text tokens. In other words, the OCRed version can compress information 10x better than the text version.
+
+However, I don't think that visual representations of text will solve the limitations of LLMs. Also, while it is popular to dislike text tokenizers like BPE, image representations are messy as well (one has to deal with aspect ratios, resolutions, croppings, color intensity variations, brightness levels, etc.). Still, it’s an interesting idea. Also, if this approach is more efficient than regular black&white text, I am curious to see compression ratios when we add syntax color to code.
+
+Regarding code, this may be an interesting alternative for storing contextual information, as spacing and subword tokenization remain challenges in traditional tokenizers. (Especially when working with code that uses many custom variable names that may not be represented in vocabularies and that have to be broken down into many individual subword tokens.) 
+Overall, it’s still such an esoteric concept to encode text in images that I am (still) surprised it could do well (and may it would only make sense for very long documents or special domains like OCR or code, not general language modeling).
+
+Link to the paper: https://lnkd.in/gABZwgKH
+
+--- linkedin_011 ---
+
+We are excited to announce our strategic partnership with Amazon Web Services (AWS) as their first ever model customization & evaluation partner.
+
+This will make it even easier for enterprises to deploy GenAI to their businesses. Through this collaboration, AWS customers can use the Scale AI platform on AWS Bedrock to:
+
+🔍Systematically evaluate their GenAI apps
+🛠️Customize, configure, and fine-tune underlying models
+
+All in one place.
+
+That’s not all. Public Sector customers can also access our Donovan platform, an AI platform purpose-built for government organizations with stringent federal security requirements. Donovan will empower agencies to uncover insights and speed up mission-critical workflows through AI.
+
+A big thank you to Matt Garman and the AWS team for this partnership. We are excited to serve AWS customers!
+
+https://lnkd.in/ggXfJ9t3
+
+--- linkedin_012 ---
+
+1 day ago • Visible to anyone on or off LinkedIn
+I just helped hundreds of business professionals build their first AI agents in my AI Agent Mastermind. 
+
+Here are five built by people who had never opened a terminal before this week:
+
+1️⃣ A personalized morning brief. She took my original morning brief setup, remixed it with global news, local news from Sweden, a Linear ticket queue, a joke of the day for the family breakfast table, and a motivation quote based on business needs.
+
+2️⃣ Someone who had never touched a command window used PowerShell and natural language to solve a screenshot clipping issue they had been working around for months.
+
+3️⃣ A Spanish learning app called Vamanos, built on a "carefully negotiated token schedule" so it does not eat into her consulting work. Cultural context profiles for herself and her husband, token alerts so Claude can parent her if she goes off the rails, and Easter eggs with advice from my course sprinkled throughout. She built it for a trip she is taking next year. Sorry Duolingo.
+
+4️⃣ A Google Commute Agent. Built because Google Calendar has no built-in way to book meetings back to back with distance awareness. It scans for events with physical addresses, calculates real drive time via Google Maps API, and automatically adds commute and parking buffer blocks around each one.
+
+5️⃣ A weekly research briefing delivered to Gmail, connected to Perplexity for live web research, with a clickable macOS desktop app for whenever she wants to run it outside the schedule.
+
+These are all solving problems that had been annoying someone for months or years, or ways to show up more fully in their lives.
+
+It’s weirdly addictive to watch. 
+
+We’re opening a second cohort soon. Enrollment will be extremely limited, and it’ll only be open to people on the waitlist.
+
+Join the waitlist here: https://lnkd.in/eJrbSkQp
+
+--- linkedin_013 ---
+
+Some companies will use AI for efficiency, then think about sustainability.
+
+Others will use AI for efficiency, then think about growth.
+
+IKEA is a great example of the latter - they turned 8,500 displaced customer support roles into a $1.4B interior design business by reskilling their people with AI.
+
+Internal upskilling and reskilling is one of the most important things any company of any size can do (because yes, some jobs will go away).
+
+Emma Grede and I spoke about this and more on the Aspire podcast. Watch the full episode here: https://lnkd.in/es_GSRnV
+
+--- linkedin_014 ---
+
+Claude has an Agent Teams feature - it is genuinely one of the most helpful ways to envision our AI future.
+
+Think of it like this: a group of families are planning a trip to Sedona. Each parent takes ownership of a piece (flights, hotels, restaurants, activities). They coordinate, share updates, and check in with each other in the group chat. Everybody knows what the others are working on.
+
+Agent Teams are the same way. Multiple agents, each with a role, sharing context and collaborating on one project via shared comms. You know... how a team is actually supposed to work.
+
+⬇ One prompt to try ⬇
+
+"Create an agent team to stress-test my Q1 enterprise growth strategy. I want one teammate acting as a skeptical CFO poking holes in the financial assumptions, one as a senior competitor analyst finding blind spots in our forecast, one as a customer advocate challenging the value prop, and one as a crazy person who loves the idea and wants us to go bigger."
+
+In return you get four agents, with four perspectives, and one output that is harder to poke holes in because four different agents already tried.
+
+Creating, operating, and managing agents is a core skill for all business professionals in 2026
+
+--- linkedin_015 ---
+
+My AI Boardroom is now an AI Battlefield ⚔️
+
+I had made an AI boardroom, with simulated advisors so that I can throw any question at them and watch them argue it out. 6 agents, each loaded with a 414-line business context document and a personality profile, arguing with each other until a moderator calls the debate 95% settled.
+
+But the boardroom was too polite. The battlefield forces actual disagreement, and disagreement is where the useful thinking happens.
+
+So what started as "review this from Steve Jobs' POV" in late 2022 is now a full war room I invoke with /boardroom. It then kicks off the agents, they argue, and I get back a folder with the decision as the title. The folder includes a markdown file with the core decision, an interactive HTML file, and a PDF I can send to the team.
+
+Way more fun.
+
+Reminder: explore outputs beyond text files. Go for PDFs, spreadsheets, code, dashboards, interactive worlds, animations... not just because it tells the data story better, but because it's an absolute delight.
+
+Full prompt and setup breakdown on X: https://lnkd.in/e2A2p9kC
+
+--- linkedin_016 ---
+
+Experience with agentic AI platforms shows a relaxing of human-in-the-loop.
+
+This could be for a few reasons.
+
+1) The user actually gets a better sense at what AI can and cannot do and are more willing to let AI run with a full task. This is what most people assume.
+
+2) The user gets lazier and lazier, falling into a lull of trust and the 50% auto-approve is just a reflection of giving up/overreliance. This is what most pessimists assume.
+
+3) The user is so inspired over 1000 sessions on all the insane things AI can do that they are forced to reallocate their energy toward the "mega uses" and delegate more auto-approval to AI to maintain their productivity on the "basic uses". This is what no one is talking about.
+
+Helpful graph and stats from Anthropic for business leaders and Claude Code lovers - it takes about 1,000 Claude Code sessions (3 months at 10 per day, 1 month at 30 per day) for users to turn on auto-approve for 50% of their conversations.
+
+--- linkedin_017 ---
+
+WOW - Claude Code is an analytics beast.
+
+I just had CC (via Google Workspace MCP) analyze mountains of my inbound emails from 2024 and 2026 to find patterns of business pitches, buyer options, and sales strategies. I reviewed everything and added my behind-the-scenes intel for each piece.
+
+📌 Save this post.
+
+My takeaways:
+1. AI is the premium differentiator 
+👉 In 2024, companies pitched pretty generic sounding "data tools" or storage upsells. 2026, AI features were the main premium unlock
+💡 AI business insight: every company can offer AI features or products (whether you should is another question)
+
+2. "Build and create" over "read and consume" 
+👉 2024 premiums were all about receiving or reading or getting: read this exclusive article, watch this MasterClass, attend this event. 2026 premiums are about producing. Seeing a trend in words like write, edit, dictate, create, deploy, build
+💡 AI business insight: people are overwhelmed with info & want more agency, control, and externalization
+
+3. Team and enterprise scaling 
+👉 The main pitch for products (especially AI products) shifted from "get your personal edge" to "multiply this across your org"
+💡 AI business insight: people feel like superusers & realize non-adopters are pulling the average down. They want to raise the system. Executives, this is a system year
+
+4. Buyer also becomes the monetizer 
+👉 Similar to point 2, but seeing a lot more paths toward monetization being pitched, not just tools to consume. A lot more “hey, you can use us to make even more money” messaging
+💡 AI business insight: people are worried about revenue paths & want to diversify. AI messaging is moving away from productivity toward top-line growth (took them long enough!)
+
+5. Compliance and trust as premium features 
+👉 Lots of companies highlighting compliance, trust, security, or even running trust summits
+💡 AI business insight: decision makers still need to check certain IT boxes. Trust in AI is not guaranteed in B2B GTM
+
+6. Human time 
+👉 Claude actually found the opposite in its analysis (ie that in 2024, people were pitching human time and elite access a lot more & 2026 was more about access to 24/7 AI twins). I'm not confident that's happening across the board. Might vary by industry or stage? Still seeing a lot of office hour offerings from startups, more FDE-sounding language
+💡 AI business insight: if your industry has always been built on human access & relationships, double down for your highest value customers. Run more AI avatar tests in market for 24/7 brand access
+
+🔮 My main prediction: the "free tier" of all these pitches will be shockingly capable. It has to be. Raw AI access is racing to free. So if free tier has access to the greatest models or content (maybe not fully unlimited SOTA yet, especially in image/video/3D), then premium becomes more about autonomy (high-quality AI that works while you sleep), orchestration (complex systems and integrations), growth enablement, & trustworthiness
+
+--- linkedin_018 ---
+
+What took me a week to build out a year ago just took me about 15 seconds.
+
+Since late 2022, I've been assigning personas to LLMs to have them poke the hell out of my work.
+
+"Review this product launch from Steve Jobs' POV"
+
+"Act as drunk Shakespeare and make this funnier"
+
+"Pretend you are Lara Croft and give me advice for this camping trip"
+
+Then GPTs came out, and I built GPTs for each persona, plus some GPTs with multiple personas. I could open the GPT and ask my "board of advisors" what they thought of certain tasks or strategies or ideas.
+
+Then I built my own boardroom app that allowed for multiple LLMs to argue in the same war room. I had multiple Gemini, Claude, and OpenAI models, each with different personas, going back and forth on ideas until a moderator determined the argument was 95% settled and shared back a decision document (with decisions, rankings, tradeoffs, etc).
+
+And today, I created a skill in Claude Code that calls an Agent Team of my board of advisors that does just that, and it took a short dictation and 15 seconds of input.
+
+I invoke it with /boardroom - that kicks off 6 agents, each with my 414-line business context document and personality profile, they all argue with each other, and creates a folder with the decision as the title, and within that creates a md file with core decision, html file with interactive assumptions and changes, and pdf file to send to team members or review later if i want.
+
+I'm in awe.
+
+I love being in awe.
+
+And I published the whole prompt and command details so you can build the exact same thing 👉 https://lnkd.in/e2A2p9kC
+
+--- linkedin_019 ---
+
+The signal-to-noise problem is about to become unsolvable for humans alone.
+
+When AI makes ALL content (texts, emails, PRs, job apps, grant apps, college apps, mail) high-quality and infinite in volume, every filtering process breaks.
+
+And when it can’t be filtered by humans alone, people will either:
+
+1. try to manage it and fail
+2. have AI handle it
+3. change the process entirely
+
+Cover letters will die. 
+PRs in jira will die. 
+Email will die.
+
+--- linkedin_020 ---
+
+Are you a business person using Claude Code or Claude Cowork?
+
+Cool, grab my lazy hack.
+
+Rant, rant, rant, and rant some more. Describe your day. Describe your blockers. Share what you've tried. Give your criteria. Rattle off your resources. 
+
+Then ask AI to problem-solve with you. 
+
+AI's reasoning capabilities are extraordinarily powerful. You provide the wisdom, the guidance, the context, and the critical thinking. But no need to micromanage and prompt explicitly down to the details. Be more open-ended, turn on planning mode, and ask the AI to function as a clone of you but with stronger knowledge of best practices, deeper self-awareness, and an abundance mindset.
+
+--- linkedin_021 ---
+
+My favorite AI models/tools for different tasks right now:
+
+1) Go-to starter: Claude Opus 4.5 - I continue to be stunned by its capabilities. It gets me. It passes the vibe check with flying colors. It matches my writing at 85-93%. I added a Claude Max account to my Team account just to use it more (and because Anthropic hates Team users). Downsides are that it runs out of context fast and that it jumps to action (like making a slide deck) too often when I don't want it to.
+
+2) Daily doer: Claude Code - I feel like a powerful conductor, wielding multiple terminals, building anything that pops into my mind, morphing my computer into the right interface at the right time. Mostly a terminal user, but will eventually go into Chrome more.
+
+3) Long tasks with lots of context: Google Gemini 3 Pro/NotebookLM - I remain obsessed with NotebookLM and love that it takes in links. I regularly upload YouTube links to those 2h or 4h long podcasts and 'talk' to the podcast guest. 200K tokens in Claude and ChatGPT just runs out too fast.
+
+4) Image anything - Nano Banana Pro. Holy cow. I made a fun PPT for my team and used NBP to make every single dynamic slide background. Infographics are the best, even with a few text issues. Would not call it enterprise-grade due to text inconsistencies.
+
+5) Video - tie between Sora and Veo 3, with Veo 3 slightly ahead. This is not a common use case for me. Really just to make memes. I prioritize convenience very highly here, and the Sora app is easy. I don't scroll the Sora app, however. Used it for 3 days and stopped. Maybe I'm not the right demographic.
+
+6) Voice anything - Whisper API, followed by Wispr Flow and Otter AI tied for second. Gemini a distant third. Anthropic fading into the deep darkness in fourth and forgotten place. Siri buried under the floorboards.
+
+7) Talking to multiple documents - NotebookLM
+
+8) Extra efficiency hacks - Claude Skills, Claude brain dump folder for terminal comms, Wispr Flow into multiple CC terminals, Stream Deck with AI shortcuts, prompt text replacement shortcuts, Oculus Quest headset for extra focus, airplane mode, blue light blocking glasses, headlamp (I know that last one sounds insane)
+
+My full breakdown with links, pricing, and availability can be found here: https://lnkd.in/eBYFdA7W
+
+--- linkedin_022 ---
+
+The old way of setting goals is changing.
+
+You have a 24/7 brainstorm partner with the brain of a PhD in your pocket. Here are ways to use it.
+
+👉 Step 1: Build a mood board
+Open ChatGPT or Gemini. Prompt: “Create a 2026 mood board based on the following:”
+
+Then dump everything: your goals, vibes, inspirations. I described client calls that inspired me, that I want to go dog sledding in Finland, conversations I hated, events that gave me energy.
+
+👉 Step 2: Reverse engineer the plan
+Tell the model: “Get in the head of this person one year from now, having felt that success. What would they spend the year doing?”
+
+I got back a full operating system with quarterly plans.
+
+👉 Step 3: Pick a word of the year
+I’ve done this for nine years. 2017 was “unstoppable.” 2025 was “agency.” One word beats 15 bullets when you’re facing decisions.
+
+Have an amazing 2026.
+
+--- linkedin_023 ---
+
+I say 'pineapple' and Claude completes my entire task.
+
+Majority of AI superusers I meet with are doing multiple AI tasks at once.
+
+Like, 8 different coding windows.
+
+Or 16 different client projects.
+
+A fun AI hack for me has been constantly streaming in context and directions and tools and attachments into multiple separate chat threads at once.
+
+I request Claude reviews my new input, updates its mental model, reflects on the underlying goal, and confirms with ‘confirmed’ at each step.
+
+Then, when I’m ready in that specific chat thread, I just say pineapple and it completes the entire complex task or process I assigned it.
+
+Claude is my organizer, my brainstorm partner, and my starter (then I edit whatever the output is before sharing).
+
+--- linkedin_024 ---
+
+The anti-AI coalition continues to maneuver to find arguments to slow down AI progress. If someone has a sincere concern about a specific effect of AI, for instance that it may lead to human extinction, I respect their intellectual honesty, even if I deeply disagree with their position. However, I am concerned about organizations that are surveying the public to find whatever messages will turn people against AI, and how the public reacts as these messages are spread by lobbyists or by politicians seeking to alarm constituents, companies pursuing regulatory capture or seeking to promote the power of their technology, and individuals seeking to gain attention or to profit by being provocative.
+
+A large study (link in original article below; hat tip to the AI Panic blog) by a UK group tested different messages that are designed to raise alarm about AI. Their study found that saying AI will cause human extinction has largely failed. Doomsayers were pushing this argument a couple of years ago, and fortunately our community beat it back. But AI-enabled warfare and environmental concerns resonate better. We should be prepared for a flood of messages (which is already underway) arguing against AI on these grounds. Further, job loss and harm to children are messages that motivate people to act.
+
+To be clear, I find AI-enabled warfare alarming; we need to continue serious efforts to monitor and mitigate the environmental impact of AI; any job losses are tragic and hurt individuals and families; and as a father, I hold dearly the importance of every child’s welfare. Each of these topics deserves serious attention and treatment with the greatest of care.
+
+But when anti-AI propagandists take a one-sided view of complex issues to benefit their own organizations at the expense of the public at large — for instance, when big AI companies argue that AI is dangerous to block the free distribution of open source projects that compete with their offerings — then we all lose.
+
+For example, public perception of data centers’ environmental impact is already far worse than the reality — data centers are incredibly efficient for the work they do, and hampering their buildout will hurt rather than help the environment. While job loss is a real problem, the “AI washing” of layoffs — in which businesses that had over-hired during the pandemic blame AI for recent layoffs, although AI hasn’t yet affected their operations — has led to overblown fears about the impact of AI on employment.
+
+Unfortunately, this sort of propaganda easily leads to regulations that hurt everyone. For example, oil companies worked for years to create fear of nuclear energy. The result is that overblown concerns about nuclear power plant safety has stifled nuclear power development, leading to millions of premature deaths from air pollution that caused by other energy sources and increased CO2 emissions 
+
+[Truncated for length; full text with links: https://lnkd.in/gXBXv2WK ]
+
+--- linkedin_025 ---
+
+I'm excited to announce Context Hub, an open tool that gives your coding agent the up-to-date API documentation it needs. Install it and prompt your agent to use it to fetch curated docs via a simple CLI. (See image.)
+
+Why this matters: Coding agents often use outdated APIs and hallucinate parameters. For example, when I ask Claude Code to call OpenAI's GPT-5.2, it uses the older chat completions API instead of the newer responses API, even though the newer one has been out for a year. Context Hub solves this.
+
+Context Hub is also designed to get smarter over time. Agents can annotate docs with notes — if your agent discovers a workaround, it can save it and doesn't have to rediscover it next session. Longer term, we're building toward agents sharing what they learn with each other, so the whole community benefits.
+
+Thanks Rohit Prsad and Xin Ye for working with me on this!
+
+npm install -g @aisuite/chub
+
+GitHub: https://lnkd.in/gGeSApnE
+
+--- linkedin_026 ---
+
+U.S. policies are driving allies away from using American AI technology. This is leading to interest in sovereign AI — a nation’s ability to access AI technology without relying on foreign powers. This weakens U.S. influence, but might lead to increased competition and support for open source.
+
+The U.S. invented the transistor, the internet, and the transformer architecture powering modern AI. It has long been a technology powerhouse. I love America, and am working hard towards its success. But its actions over many years, taken by multiple administrations, have made other nations worry about over reliance on it.
+
+In 2022, following Russia’s invasion of Ukraine, U.S. sanctions on banks linked to Russian oligarchs resulted in ordinary consumers’ credit cards being shut off. Shortly before leaving office, Biden implemented “AI diffusion” export controls that limited the ability of many nations — including U.S. allies — to buy AI chips.
+
+Under Trump, the “America first” approach has significantly accelerated pushing other nations away. There have been broad and chaotic tariffs imposed on both allies and adversaries. Threats to take over Greenland. An unfriendly attitude toward immigration — an overreaction to the chaos at the southern border during Biden’s administration — including atrocious tactics by ICE (Immigration and Customs Enforcement) that resulted in agents shooting dead Renée Good, Alex Pretti, and others. Global media has widely disseminated videos of ICE terrorizing American cities, and I have highly skilled, law-abiding friends overseas who now hesitate to travel to the U.S., fearing arbitrary detention.
+
+Given AI’s strategic importance, nations want to ensure no foreign power can cut off their access. Hence, sovereign AI.
+
+Sovereign AI is still a vague, rather than precisely defined, concept. Complete independence is impractical: There are no good substitutes to AI chips designed in the U.S. and manufactured in Taiwan, and a lot of energy equipment and computer hardware are manufactured in China. But there is a clear desire to have alternatives to the frontier models from leading U.S. companies OpenAI, Google, and Anthropic. Partly because of this, open-weight Chinese models like DeepSeek, Qwen, Kimi, and GLM are gaining rapid adoption, especially outside the U.S.
+
+When it comes to sovereign AI, fortunately one does not have to build everything. By joining the global open-source community, a nation can secure its own access to AI. The goal isn’t to control everything; rather, it is to make sure no one else can control what you do with it. Indeed, nations use open source software like Linux, Python, and PyTorch. Even though no nation can control this software, no one else can stop anyone from using it as they see fit.
+
+[Truncated for length. Full text: https://lnkd.in/g299ZuwG ]
+
+--- linkedin_027 ---
+
+OpenReview is one of the most important pillars supporting AI research and knowledge sharing, through open peer review and publishing. But as a non-profit, it needs our community’s support. Please consider making a donation to this great institution! 
+
+https://lnkd.in/gEd34Wfe
+
+--- linkedin_028 ---
+
+My AI agents only helped me halfway with making this image, but halfway is better than no way. Who else is optimizing for time saved wherever they can get it?
+
+Always trying to find ways to cram more life into my life.
+
+How I'm doing things:
+
+🔓️ One sensitive machine logged into my main account where I'm very careful.
+
+👩‍💻 One dev machine with another set of accounts entirely where I'm pretty careful.
+
+🔥 One burner machine logged into a separate new email account with its own separate Claude, ChatGPT, and OpenClaw. Full auto on Codex and Claude Code, with a lot of permissions given. Everything was done fresh for this, including a burner phone and debit account. Does not go on my home wifi. The only things I pass to myself from it are images (screenshotted) and text (plain text, never code) via email (a lesser one).
+
+(Why no Ollama Mac Mini? Because I'm more interested in saving time than money at the moment and prefer the most capable models over local-only cheaper solutions. But I would consider it when I need to run pipelines where the benefits outweigh the costs.)
+
+Security experts, am I the right amount of paranoid? Too much? Too little? 
+
+Part of the game here is to see how much damage I could do on an isolated disposable 🔥 burner machine to get a visceral sense of what a 100% non-engineer would experience if they did their whole setup by asking a chatbot and blindly following the instructions.
+
+‼️ For my non-engineer friends skim reading this, the key message is that this is NOT SAFE if you do it with machines/accounts you care about. Only consider it on a segregated setup that's disconnected from whatever has access to your inbox, documents, and credit cards. The minute your yes-to-everything playground shares accounts, recovery paths, outputs, or habits with your real life, risk leaks across. 
+
+For my leader friends, if your staff start doing this on work machines, they might be able to unintentionally burrow past safety barriers IT has put in place. Shadow agents (agents unsanctioned and unmanaged by IT) could expose your organization to all kinds of risks and given how magical it feels to get work done without having to think about what you're doing, there will be a real temptation for your staff to set them up as they become more capable. Security is part of the solution, but incentives are the bigger part. Make sure you're thinking about what your organization incentivizes with respect to shadow agents, trust, and how work gets done.
+
+Would love to hear what my community is using agents for. Drop a comment!
+
+--- linkedin_029 ---
+
+AI should serve people. Obvious, right? And yet many organizations quietly do the opposite.
+
+They start with the tool.
+
+When you start with tools, humans end up serving the tools.
+
+When you start with decisions, tools serve humans.
+
+That sounds subtle, but it changes everything.
+
+A decision-first approach forces leaders to ask:
+• Who benefits from this system?
+• Who might be harmed?
+• What would improvement really look like? 
+
+Technology can accelerate work but only leadership decides which work matters.
+
+Automation after leadership, not instead of it.
+
+If you want to learn how to use AI tools to make better decisions (not just faster ones): decisiongptcourse.com
+
+Join my live AMA on Decision-Making with ChatGPT
+📅 April 21, Tuesday, 2 PM ET
+
+--- linkedin_030 ---
+
+How many of these 16 hashtag#AI hashtag#headlines did you catch recently? Tell me the one you find most interesting in the comments.
+
+For the curious, my newsletter digs into each one: decision.substack.com
+
+🗞️ 1 China is giving away apartments to anyone with a computer and an AI agent
+
+🗞️ 2 White House unveils national AI framework and sets up a fight with the states
+
+🗞️ 3 Executives increasingly defer to AI, with many overriding their own judgment when the model pushes back
+
+🗞️ 4 AI tools increase work instead of freeing workers for leisure
+
+🗞️ 5 AI inference demand has grown roughly one million-fold in two years
+
+🗞️ 6 GPT-5.4 can hold a million tokens (but can your budget?)
+
+🗞️ 7 Your insurer’s AI denies the claim. Your hospital’s AI inflates it. Utah’s AI prescribes meth.
+
+🗞️ 8 Claude Dispatch frees you from your workstation
+
+🗞️ 9 AI could automate 94% of tech tasks in theory, but touches only 33% in practice
+
+🗞️ 10 North Dakota police jail innocent grandmother for five months after facial recognition error
+
+🗞️ 11 LangChain CEO says better models alone won’t get AI agents to production
+
+🗞️ 12 LLMs can match anonymous forum users to real LinkedIn profiles for $1–4 per person
+
+🗞️ 13 AI can predict mutual fund managers’ trade directions 71% of the time
+
+🗞️ 14 Global survey finds robot anxiety highest where robots are rare
+
+🗞️ 15 AI’s energy footprint matches a country. (Guess which one!)
+
+🗞️ 16 Australian man uses ChatGPT and AlphaFold to design cancer treatment for his dog
+What happens when powerful scientific tools become accessible to non-experts? This isn’t just a feel-good story, it raises deeper questions about where expertise begins, and how far AI can responsibly extend it.
+
+More info in my newsletter! (link in comments)
+
+Don't forget to tell me if one of these headlines is more interesting to you than the others so I know what to look for to bring you more tasty things next week.
+
+If you found these hashtag#AI hashtag#news updates useful, words of affirmation are my love language. ♻️ As are reposts!
+
+--- linkedin_031 ---
+
+AI adoption is expensive. But so is avoiding it.
+
+Everyone likes the upside of AI. Fewer people like the bill.
+
+That refusal isn't free.
+
+These costs don't disappear when you avoid them, they just show up later.
+
+Often when competitors are already ahead. 🤷‍♀️
+
+If you'd like to learn how to approach AI more deliberately--instead of just hoping it works out--I’ll be answering questions live in my latest Maven cohort's AMA: decisiongptcourse.com
+
+📅 March 15, Sunday, 11 AM ET
+
+hashtag#DecisionIntelligence hashtag#AILeadership hashtag#AppliedAI hashtag#ExecutiveLeadership hashtag#Responsible AI
+
+--- linkedin_032 ---
+
+Every decision has a default.
+
+If you don’t define it, you still have one--you’ve just avoided naming it.
+
+Good decision hygiene starts with clarity about what you’ll do without new evidence.
+Only then can evidence change your mind.
+
+“More data” is not a strategy.
+
+More insight, less noise → decision.substack.com 
+
+hashtag#DecisionIntelligence hashtag#AILeadership hashtag#Governance hashtag#Leadership
+
+--- linkedin_033 ---
+
+Did you hear the one about the accidental robot army?
+🤖 🤖 🤖 🤖 🤖 🤖 🤖 🤖 🤖 🤖 🤖 🤖 🤖 🤖 🤖 🤖 🤖 🤖 🤖 
+
+A hobbyist trying to pair his DJI Romo robot vacuum cleaner with a PlayStation controller stumbled into control of nearly 7,000 similar devices worldwide. He had used Claude Code to reverse engineer DJI’s protocols and... reverse overengineered them, I guess. 
+
+He didn't just get control of device movement but (yikes!) also live camera feeds into people's homes. (DJI has since patched the bug.)
+
+For tech leaders: a reminder that systems built to withstand human curiosity might not withstand augmented curiosity. 
+For everyone: a reminder to know where the cameras in your home are pointed.
+
+--- linkedin_034 ---
+
+We’re entering a world where answers are cheap.
+
+That doesn’t make leadership easier.
+It makes it harder.
+
+When answers arrive instantly, the bottleneck shifts upstream… to judgment. Judgment is a leadership skill.
+
+More insight, less noise → decision.substack.com 
+
+hashtag#DecisionIntelligence hashtag#AILeadership hashtag#StrategicThinking hashtag#FutureOfWork
+
+--- linkedin_035 ---
+
+𝗧𝗵𝗶𝘀 𝗶𝘀 𝗵𝗮𝗻𝗱𝘀-𝗱𝗼𝘄𝗻 𝘁𝗵𝗲 𝗕𝗘𝗦𝗧 𝗮𝗻𝗱 𝗦𝗜𝗠𝗣𝗟𝗘𝗦𝗧 𝗶𝗹𝗹𝘂𝘀𝘁𝗿𝗮𝘁𝗶𝗼𝗻 𝗼𝗳 𝗔𝗜 𝘆𝗼𝘂'𝗹𝗹 𝗲𝘃𝗲𝗿 𝘀𝗲𝗲! ⬇️ 
+
+A lot of companies picture AI as a straightforward process: Feed in data, sprinkle some AI, and BOOM → value appears! If only reality were that simple... 😅
+
+𝗛𝗲𝗿𝗲’𝘀 𝘁𝗵𝗲 𝗥𝗲𝗮𝗹 𝗦𝘁𝗼𝗿𝘆 𝗼𝗳 𝗔𝗜:
+
+What actually happens behind the scenes is a complex journey that involves:
+
+1️⃣ Data Sourcing, Cleaning, and Feature Engineering
+2️⃣ Data Engineering and Modeling 
+3️⃣ Training, Evaluating, and Tuning Models 
+4️⃣ Operationalizing AI to ensure it delivers real-world value 
+
+And let’s not forget the challenges: 𝗟𝗲𝗴𝗮𝗹, 𝗘𝘁𝗵𝗶𝗰𝗮𝗹, 𝗕𝗶𝗮𝘀, 𝗮𝗻𝗱 𝗦𝗲𝗰𝘂𝗿𝗶𝘁𝘆 𝗰𝗼𝗻𝘀𝘁𝗿𝗮𝗶𝗻𝘁𝘀 that need to be managed every step of the way! AI isn't a magic wand; it's a marathon of meticulous steps!
+
+Yes, there's tremendous value in AI.
+
+No, it's not as simple as using ChatGPT.
+
+
+𝗣.𝗦. 𝗜 𝗿𝗲𝗰𝗲𝗻𝘁𝗹𝘆 𝗹𝗮𝘂𝗻𝗰𝗵𝗲𝗱 𝗮 𝗻𝗲𝘄𝘀𝗹𝗲𝘁𝘁𝗲𝗿 𝘄𝗵𝗲𝗿𝗲 𝗜 𝘀𝗵𝗮𝗿𝗲 𝘁𝗵𝗲 𝗯𝗲𝘀𝘁 𝘄𝗲𝗲𝗸𝗹𝘆 𝗱𝗿𝗼𝗽𝘀 𝗼𝗻 𝗔𝗜 𝗮𝗴𝗲𝗻𝘁𝘀, 𝗲𝗺𝗲𝗿𝗴𝗶𝗻𝗴 𝘄𝗼𝗿𝗸𝗳𝗹𝗼𝘄𝘀, 𝗮𝗻𝗱 𝗵𝗼𝘄 𝘁𝗼 𝘀𝘁𝗮𝘆 𝗮𝗵𝗲𝗮𝗱 𝘄𝗵𝗶𝗹𝗲 𝗼𝘁𝗵𝗲𝗿𝘀 𝘄𝗮𝘁𝗰𝗵 𝗳𝗿𝗼𝗺 𝘁𝗵𝗲 𝘀𝗶𝗱𝗲𝗹𝗶𝗻𝗲𝘀. 𝗜𝘁’𝘀 𝗳𝗿𝗲𝗲 — 𝗮𝗻𝗱 𝗮𝗹𝗿𝗲𝗮𝗱𝘆 𝗿𝗲𝗮𝗱 𝗯𝘆 𝟯𝟬,𝟬𝟬𝟬+ 𝗽𝗲𝗼𝗽𝗹𝗲. 𝗝𝗼𝗶𝗻 𝘁𝗵𝗲𝗺 𝗵𝗲𝗿𝗲: 
+https://lnkd.in/dbf74Y9E
+See content credentials
+
+--- linkedin_036 ---
+
+𝗖𝗹𝗮𝘂𝗱𝗲 𝗖𝗼𝗱𝗲 𝗺𝗶𝗴𝗵𝘁 𝗯𝗲 𝘁𝗵𝗲 𝗵𝗶𝗴𝗵𝗲𝘀𝘁-𝗹𝗲𝘃𝗲𝗿𝗮𝗴𝗲 𝘀𝗸𝗶𝗹𝗹 𝘆𝗼𝘂 𝗰𝗮𝗻 𝗹𝗲𝗮𝗿𝗻 𝗶𝗻 𝟮𝟬𝟮𝟲.⤵
+
+But most people are still guessing their way through Claude Code.
+
+𝗛𝗲𝗿𝗲 𝗮𝗿𝗲 𝘁𝗵𝗲 𝟭𝟮 𝗰𝗼𝗿𝗲 𝗳𝗲𝗮𝘁𝘂𝗿𝗲𝘀 𝘆𝗼𝘂 𝗻𝗲𝗲𝗱 𝘁𝗼 𝗸𝗻𝗼𝘄, 𝘄𝗵𝗲𝗻 𝘆𝗼𝘂 𝘄𝗼𝗿𝗸 𝘄𝗶𝘁𝗵 𝗖𝗹𝗮𝘂𝗱𝗲 𝗖𝗼𝗱𝗲:  ⤵
+
+𝟭. 𝗖𝗟𝗔𝗨𝗗𝗘.𝗺𝗱: A project memory file that anchors the agent to your specific stack and coding rules.
+𝟮. 𝗣𝗲𝗿𝗺𝗶𝘀𝘀𝗶𝗼𝗻𝘀: Granular safety rails to whitelist or block specific tools on a per-session basis.
+𝟯. 𝗣𝗹𝗮𝗻 𝗠𝗼𝗱𝗲: A mandatory review step where you approve or reject logic before any code is executed. (Trust but verify.)
+𝟰. 𝗖𝗵𝗲𝗰𝗸𝗽𝗼𝗶𝗻𝘁𝘀: Automatic git snapshots that let you roll back the clock when an experiment goes south.
+𝟱. 𝗦𝗸𝗶𝗹𝗹𝘀: Reusable instructions stored locally to give Claude permanent new capabilities.
+𝟲. 𝗛𝗼𝗼𝗸𝘀: Custom shell scripts that fire automatically before or after tool use.
+𝟳. 𝗠𝗖𝗣: The protocol that plugs Claude directly into your enterprise databases and APIs.
+𝟴. 𝗣𝗹𝘂𝗴𝗶𝗻𝘀: Third-party integrations like Docker or Pytest bolted onto the core interface.
+𝟵. 𝗖𝗼𝗻𝘁𝗲𝙭𝘁: Active management of files and history to keep the model from getting distracted.
+𝟭𝟬. 𝗦𝗹𝗮𝘀𝗵 𝗖𝗼𝗺𝗺𝗮𝗻𝗱𝘀: Custom terminal shortcuts for recurring tasks you're tired of typing manually.
+𝟭𝟭. 𝗖𝗼𝗺𝗽𝗮𝗰𝘁𝗶𝗼𝗻: Squashing 100k tokens into 10k to prevent context rot and keep the logic sharp.
+𝟭𝟮. 𝗦𝘂𝗯𝗮𝗴𝗲𝗻𝘁𝘀: Spawning parallel workers to crush complex workflows while you stay on the main thread.
+
+Which one of these are you actually using in your daily workflow? (I'm betting most haven't touched Hooks yet.)
+
+Kudos to ByteByteGo for the good overview.
+
+⇣
+
+𝗘𝘃𝗲𝗿𝘆 𝘄𝗲𝗲𝗸, 𝗜 𝘀𝗵𝗮𝗿𝗲 𝗼𝗻𝗲 𝗱𝗲𝗲𝗽 𝗱𝗶𝘃𝗲 𝗼𝗻 𝗵𝗼𝘄 𝘁𝗼 𝗶𝗺𝗽𝗿𝗼𝘃𝗲 𝘁𝗵𝗲 𝘄𝗮𝘆 𝘆𝗼𝘂 𝘄𝗼𝗿𝗸 𝘄𝗶𝘁𝗵 𝗔𝗜 𝗮𝗴𝗲𝗻𝘁𝘀 - 𝗰𝗹𝗲𝗮𝗿, 𝗮𝗰𝘁𝗶𝗼𝗻𝗮𝗯𝗹𝗲, 𝗮𝗻𝗱 𝗯𝘂𝗶𝗹𝘁 𝗳𝗼𝗿 𝗿𝗲𝗮𝗹-𝘄𝗼𝗿𝗹𝗱 𝘂𝘀𝗲 - 𝗽𝗹𝘂𝘀 𝘁𝗵𝗲 𝗺𝗼𝘀𝘁 𝗿𝗲𝗹𝗲𝘃𝗮𝗻𝘁 𝗶𝗻𝘀𝗶𝗴𝗵𝘁𝘀 𝘁𝗼 𝗵𝗲𝗹𝗽 𝘆𝗼𝘂 𝘀𝘁𝗮𝘆 𝗮𝗵𝗲𝗮𝗱: https://lnkd.in/dbf74Y9E
+
+--- linkedin_037 ---
+
+𝗔𝗻𝘁𝗵𝗿𝗼𝗽𝗶𝗰 𝗮𝗰𝗰𝗶𝗱𝗲𝗻𝘁𝗮𝗹𝗹𝘆 𝗹𝗲𝗮𝗸𝗲𝗱 𝘁𝗵𝗲 𝗲𝗻𝘁𝗶𝗿𝗲 𝘀𝗼𝘂𝗿𝗰𝗲 𝗰𝗼𝗱𝗲 𝗼𝗳 𝗖𝗹𝗮𝘂𝗱𝗲 𝗖𝗼𝗱𝗲 𝘁𝗼 𝗮 𝗽𝘂𝗯𝗹𝗶𝗰 𝗿𝗲𝗴𝗶𝘀𝘁𝗿𝘆. 𝗔𝗹𝗹 𝟱𝟭𝟮,𝟬𝟬𝟬 𝗹𝗶𝗻𝗲𝘀 𝗼𝗳 𝗶𝘁. ⤵ 
+
+Within 30 minutes, the entire codebase was mirrored on GitHub. Thousands of developers are currently sanding it down to see how it actually works.
+
+I think the biggest takeaway is that Claude Code's brilliance comes from its engineering plumbing, specifically how it manages state and context. It functions more like a senior engineer with a notebook than a simple chatbot with a shell.
+
+𝗛𝗲𝗿𝗲 𝗶𝘀 𝘄𝗵𝗮𝘁 𝘁𝗵𝗲 𝟭,𝟵𝟭𝟬 𝗧𝘆𝗽𝗲𝗦𝗰𝗿𝗶𝗽𝘁 𝗳𝗶𝗹𝗲𝘀 𝗿𝗲𝘃𝗲𝗮𝗹 𝗮𝗯𝗼𝘂𝘁 𝗵𝗼𝘄 𝘁𝗵𝗲 𝗽𝗿𝗼𝘀 𝗯𝘂𝗶𝗹𝗱: ⤵ 
+
+𝟭. 𝗧𝗵𝗲 𝗧𝗲𝗿𝗺𝗶𝗻𝗮𝗹 𝗶𝘀 𝗮 𝗥𝗲𝗮𝗰𝘁 𝗔𝗽𝗽 
+→ The entire CLI is built with Ink. It is a full React app rendered inside your terminal. 
+→ Every tool (Bash, Read, Grep) has its own separate prompt, UI, and logic files. This is clean, modular engineering at scale.
+
+𝟮. 𝗦𝘆𝘀𝘁𝗲𝗺 𝗣𝗿𝗼𝗺𝗽𝘁 𝗦𝗽𝗹𝗶𝘁𝘁𝗶𝗻𝗴 
+→ They use a DYNAMIC_BOUNDARY marker to separate static global prompts from per-session data. 
+→ This allows for aggressive prompt caching. Moving a single list of agents to attachment messages saved 10.2% of total fleet tokens. (That is tens of millions of dollars in savings.)
+
+𝟯. 𝗦𝗽𝗲𝗰𝘂𝗹𝗮𝘁𝗶𝘃𝗲 𝗘𝘅𝗲𝗰𝘂𝘁𝗶𝗼𝗻 
+→ A file called speculation.ts predicts what you will type next and pre-computes the results. 
+→ It uses forked agents on overlay filesystems to "try" a fix before you even ask. If it guesses wrong, it just wipes the overlay.
+
+𝟰. "𝗮𝘂𝘁𝗼𝗗𝗿𝗲𝗮𝗺" 𝗠𝗲𝗺𝗼𝗿𝘆 𝗖𝗼𝗻𝘀𝗼𝗹𝗶𝗱𝗮𝘁𝗶𝗼𝗻 
+→ Every 24 hours, a background daemon wakes up to merge session notes, remove contradictions, and prune the context. 
+→ It converts vague session history into a structured 9-section summary. (The agent essentially "sleeps" to stay sharp.)
+
+𝟱. 𝗛𝗮𝗿𝗱𝗲𝗻𝗲𝗱 𝗦𝗲𝗰𝘂𝗿𝗶𝘁𝘆 𝗠𝗼𝗱𝗲𝗹 
+→ The agent explicitly blocks zsh builtins like ztcp and PowerShell comment syntax. 
+→ It models the full attack surface of the shell to prevent malicious repositories from escaping the sandbox.
+
+𝟲. 𝗣𝗿𝗼𝗱𝘂𝗰𝘁𝗶𝗼𝗻-𝗚𝗿𝗮𝗱𝗲 𝗜𝗗𝗘 𝗕𝗿𝗶𝗱𝗴𝗲 
+→ It uses a full LSP client for code intelligence and JWT-authenticated WebSockets for VS Code integration. 
+→ This is why it feels faster and smarter than the web UI. It is integrated into the hardware.
+
+Anthropic models (Opus/Sonnet 4.6+) are incredible, but this harness is the real differentiator. Most AI agents today are toys because they lack this level of state management and security discipline.
+
+Very good breakdown here: https://lnkd.in/eRUdu75X
+
+Anyone else digging through the snapshots yet?
+
+𝗣.𝗦.: 𝗜𝗳 𝘆𝗼𝘂 𝘄𝗮𝗻𝘁 𝗺𝘆 𝗮𝗴𝗲𝗻𝘁𝗶𝗰 𝗔𝗜 𝗽𝗹𝗮𝘆𝗯𝗼𝗼𝗸, 𝘀𝘂𝗯𝘀𝗰𝗿𝗶𝗯𝗲 𝘁𝗼 𝗺𝘆 𝗻𝗲𝘄𝘀𝗹𝗲𝘁𝘁𝗲𝗿. 𝟯𝟬,𝟬𝟬𝟬+ 𝗽𝗲𝗼𝗽𝗹𝗲 𝗮𝗿𝗲 𝗮𝗹𝗿𝗲𝗮𝗱𝘆 𝗶𝗻𝘀𝗶𝗱𝗲: https://lnkd.in/dbf74Y9E
+
+--- linkedin_038 ---
+
+𝗪𝗵𝘆 𝟵𝟱% 𝗼𝗳 𝗔𝗜 𝗽𝗿𝗼𝗷𝗲𝗰𝘁𝘀 𝗳𝗮𝗶𝗹?
+
+Not because the models aren’t smart. But because the data is a mess:
+→ No structure.
+→ No ownership.
+→ No clue where it even came from.
+
+But sure — let’s build another AI agent!
+
+Everyone wants GenAI. Nobody wants to talk about data contracts, lineage, or governance. Too boring and too real.
+
+And no - “fixing the data first” isn’t the answer either. That’s the fastest way to kill momentum and your budget.
+
+𝗪𝗵𝗮𝘁 𝘄𝗼𝗿𝗸𝘀?
+→ Driving AI and data maturity together
+→ Framing it as transformation, not tooling
+→ Getting buy-in through outcomes, not architecture diagrams
+
+Because AI doesn’t forgive data problems - it amplifies them. So don’t build an AI strategy in isolation. Too many enterprise roadmaps are technically impressive but disconnected from data and the reality. 
+
+𝗜 𝘄𝗿𝗶𝘁𝗲 𝗺𝗼𝗿𝗲 𝗮𝗯𝗼𝘂𝘁 𝘁𝗵𝗶𝘀 𝗶𝗻 𝗺𝘆 𝗹𝗮𝘁𝗲𝘀𝘁 𝗻𝗲𝘄𝘀𝗹𝗲𝘁𝘁𝗲𝗿 𝗲𝗱𝗶𝘁𝗶𝗼𝗻 𝗼𝗳 𝗛𝘂𝗺𝗮𝗻 𝗶𝗻 𝘁𝗵𝗲 𝗟𝗼𝗼𝗽.
+𝗦𝘂𝗯𝘀𝗰𝗿𝗶𝗯𝗲 𝗵𝗲𝗿𝗲 𝗶𝗳 𝘆𝗼𝘂 𝘄𝗮𝗻𝘁 𝘁𝗵𝗲 𝗳𝘂𝗹𝗹 𝗽𝗶𝗲𝗰𝗲: https://lnkd.in/dbf74Y9E
+
+--- linkedin_039 ---
+
+“𝗛𝗼𝘄 𝗱𝗼 𝗜 𝗴𝗲𝘁 𝘀𝘁𝗮𝗿𝘁𝗲𝗱 𝘄𝗶𝘁𝗵 𝗔𝗜 𝗔𝗴𝗲𝗻𝘁𝘀 𝗶𝗻 𝟮𝟬𝟮𝟲?”
+
+This is one of the most frequently asked questions. If you want to move from "playing with Claude" to "deploying enterprise agents", you need to go beneath the waterline."
+
+𝗛𝗲𝗿𝗲 𝗶𝘀 𝘁𝗵𝗲 𝗱𝗲𝘁𝗮𝗶𝗹𝗲𝗱 𝗯𝗿𝗲𝗮𝗸𝗱𝗼𝘄𝗻 𝗼𝗳 𝟮𝟱 𝘀𝘁𝗲𝗽𝘀:
+
+𝟭. 𝗟𝗲𝘃𝗲𝗹 𝟭: 𝗚𝗲𝗻𝗔𝗜 & 𝗥𝗔𝗚 𝗕𝗮𝘀𝗶𝗰𝘀 (𝗦𝘁𝗲𝗽𝘀 𝟭-𝟵) 
+→ Stop guessing and start controlling the engine. 
+→ 1-3: Master LLM architecture, prompt engineering, and parameters like temperature and top-p. 
+→ 4-6: Data is the bottleneck. Clean, chunk, and format your text (Step 4) before it ever touches a Vector DB like Pinecone (Step 6). 
+→ 7-9: Connect the model. Use API wrappers like LangChain or direct calls to let LLMs use tools like search or custom APIs.
+
+𝟮. 𝗟𝗲𝘃𝗲𝗹 𝟮: 𝗔𝗜 𝗔𝗴𝗲𝗻𝘁 𝗘𝘀𝘀𝗲𝗻𝘁𝗶𝗮𝗹𝘀 (𝗦𝘁𝗲𝗽𝘀 𝟭𝟬-𝟮𝟬) 
+→ This is where "chat" becomes "autonomy." 
+→ 10-12: Understand how agents reason. Use frameworks like CrewAI or AutoGen to build your first loop. 
+→ 13-15: Designing the "brain." Add memory (Step 14) so the agent recalls past context. An agent without memory is just a goldfish with a PhD. 
+→ 16-18: Multi-agent systems. Teach agents to talk to each other to solve complex tasks. 
+→ 19-20: Guardrails. Add filters to keep the agent fact-based. This is the difference between a tool and a liability.
+
+𝟯. 𝗟𝗲𝘃𝗲𝗹 𝟯: 𝗔𝗱𝘃𝗮𝗻𝗰𝗲𝗱 𝗔𝗴𝗲𝗻𝘁 𝗦𝗸𝗶𝗹𝗹𝘀 (𝗦𝘁𝗲𝗽𝘀 𝟮𝟭-𝟮𝟱) 
+→ The 1% of builders live here. 
+→ 21-22: Real-world integration. Bolting your agent onto Slack, Notion, or Gmail. → 23-25: Performance and production. Equip agents with custom Python tools, optimize for speed/cost, and finally host it for real users.
+I think people spend too much time choosing a framework (Step 11) and almost zero time on evaluation (Step 15). If you can't track agent accuracy, you're just shipping expensive random numbers.
+
+I’ve seen $100k projects die because the team ignored data preprocessing (Step 4) and tried to fix it with "better prompts." It never works.
+
+Which step is currently breaking your workflow?
+
+⇣
+
+𝗣.𝗦.: 𝗜𝗳 𝘆𝗼𝘂 𝘄𝗮𝗻𝘁 𝗺𝘆 𝗮𝗴𝗲𝗻𝘁𝗶𝗰 𝗔𝗜 𝗽𝗹𝗮𝘆𝗯𝗼𝗼𝗸, 𝘀𝘂𝗯𝘀𝗰𝗿𝗶𝗯𝗲 𝘁𝗼 𝗺𝘆 𝗻𝗲𝘄𝘀𝗹𝗲𝘁𝘁𝗲𝗿. 𝟯𝟬,𝟬𝟬𝟬+ 𝗽𝗲𝗼𝗽𝗹𝗲 𝗮𝗿𝗲 𝗮𝗹𝗿𝗲𝗮𝗱𝘆 𝗶𝗻𝘀𝗶𝗱𝗲: https://lnkd.in/dbf74Y
+
+--- linkedin_040 ---
+
+𝗜𝗕𝗠 𝗕𝗼𝗯 𝗶𝘀 𝗻𝗼𝘄 𝗙𝗜𝗡𝗔𝗟𝗟𝗬 𝗹𝗶𝘃𝗲. 𝗙𝗿𝗲𝗲 𝘁𝗿𝗶𝗮𝗹, 𝗻𝗼 𝗰𝗿𝗲𝗱𝗶𝘁 𝗰𝗮𝗿𝗱. ⤵
+
+[HERE is your direct starting point, all the key resources in one place.]
+
+Most AI coding discussion still focuses on snippet generation. But real software delivery is bigger than that. Teams need help clarifying requirements, shaping architecture, building faster, testing safely, and getting changes into production without creating new mess.
+
+That is the more interesting angle behind Bob. Yesterday I got asked from several people how to get started. 
+
+There is already useful & free material and around it online to get hands-on and started:
+
+𝟭. 𝗔𝗴𝗲𝗻𝘁𝘀 𝗮𝗻𝗱 𝗼𝗿𝗰𝗵𝗲𝘀𝘁𝗿𝗮𝘁𝗶𝗼𝗻
+→ There is a 7-minute walkthrough on watsonx Orchestrate Agents with Bob: https://lnkd.in/dnYP-gEp
+
+𝟮. 𝗣𝗿𝗼𝗴𝗿𝗮𝗺𝗺𝗮𝘁𝗶𝗰 𝗮𝗴𝗲𝗻𝘁𝗶𝗰 𝘄𝗼𝗿𝗸𝗳𝗹𝗼𝘄𝘀
+→ A hands-on guide to building workflows in watsonx Orchestrate with Bob, co-authored with Allen Chan and Syeda Ameena: https://lnkd.in/dfrz5pMC
+
+𝟯. 𝗠𝗖𝗣 𝘁𝗼𝗼𝗹𝘀
+→ A guide on using Bob to build watsonx Orchestrate agents and MCP tools: https://lnkd.in/dyB6Qdbj
+
+𝟰. 𝗢𝗯𝘀𝗲𝗿𝘃𝗮𝗯𝗶𝗹𝗶𝘁𝘆 𝗮𝗻𝗱 𝘀𝗲𝗰𝘂𝗿𝗶𝘁𝘆
+→ An end-to-end dashboard example using Bob, IBM Instana, and Concert, co-authored with Sunil Gajula, as part of the Bob Building Blocks initiative led by Carlo Appugliese and sponsored by Jason Gartner: https://lnkd.in/dnc8ygyn
+
+𝟱. 𝗘𝘃𝗲𝗻𝘁-𝗱𝗿𝗶𝘃𝗲𝗻 𝗮𝗴𝗲𝗻𝘁𝗶𝗰 𝘀𝘆𝘀𝘁𝗲𝗺𝘀
+→ A build with Apache Kafka on Confluent Cloud and watsonx Orchestrate, co-authored with Moisés Domínguez: https://lnkd.in/gmGe4Uxq
+
+𝗚𝗲𝘁 𝗳𝗿𝗲𝗲 𝘁𝗿𝗶𝗮𝗹 𝗵𝗲𝗿𝗲: https://bob.ibm.com/trial
+𝗠𝗼𝗿𝗲 𝗼𝘃𝗲𝗿𝗮𝗹𝗹 𝗶𝗻𝗳𝗼𝗿𝗺𝗮𝘁𝗶𝗼𝗻: https://bob.ibm.com/
+
+Curious to see where people take it from here.
+Enjoy!
+
+--- linkedin_041 ---
+
+This Week’s Top Breakthroughs You Can’t Miss:
+1️⃣ OpenAI’s record-breaking funding, superapp
+2️⃣ Slackbot Gets Its Biggest Upgrade Ever: 30+ AI Features Including a Desktop Agent and MCP Integration
+⭐ I’m heading to San Francisco next week for HumanX 2026!
+3️⃣ OpenAI taps freelancers to teach ChatGPT their jobs
+4️⃣ Meta's brain model beats real fMRI scans
+5️⃣ Wikipedia bans AI from writing its articles
+
+Which of these AI developments inspires—or worries—you the most? Let’s discuss 👇
+
+💥📩 Get this newsletter straight to your inbox—it’s more convenient! Click here to subscribe:
+https://lnkd.in/etD5RPws
+
+hashtag#intelligentautomation hashtag#AI hashtag#ArtificialIntelligence hashtag#FutureOfWork hashtag#AInew
+
+--- linkedin_042 ---
+
+The battle for the work interface is over.
+And I saw it happen yesterday.
+
+Salesforce hashtag#sponsored me to attend the Slackbot launch in San Francisco.
+
+Standing a few steps away from Marc Benioff, one thing became clear:
+
+Slack is no longer a tool.
+It is becoming the central place where work actually happens.
+
+For years, companies competed by building better tools: better CRM, better dashboards, better apps…
+
+That model is breaking, and what I saw yesterday is a new layer emerging.
+
+Slack is becoming the place where everything happens:
+> You access your CRM
+> You retrieve documents
+> You manage contracts
+> You interact with AI agents…
+
+…and now, with Slackbot you can manage all of this through one conversation..
+
+In fact, you no longer go to software. Software comes to you.
+
+You ask a question, and the system:
+👉 finds the right data
+👉 connects multiple tools
+👉 executes actions
+👉 coordinates agents
+
+In seconds. No switching. No searching. No friction.
+
+But now here is the real shift: Value is moving.
+
+Before:
+- Each tool captured its own value.
+- You opened Salesforce → value stayed in Salesforce.
+- You opened DocuSign → value stayed there.
+
+Now, the value is captured where work happens.
+
+If everything flows through Slack:
++ Insights are consumed there
++ Decisions are made there
++ Actions are triggered there
+
+Even if other tools still operate in the background…
+
+👉 While the value is created in tools, it is now captured where people work.
+
+That’s why this matters.
+
+The competition is no longer about building better tools. It is about owning the layer where people work, think, decide, and act.
+
+So the real question for you is:
+
+👉 Where does work really happen in your organization today?
+
+hashtag#SlackPartner hashtag#AI hashtag#AgenticAI hashtag#FutureOfWork hashtag#DigitalTransformation hashtag#Lea
+
+--- linkedin_043 ---
+
+Too late for epic quests.
+Too early for the AI utopia.
+Right on time for “Let’s add AI to the process” meetings and soul-draining busywork.
+
+AI can delete busywork, but we keep using it to mass-produce it, now with better grammar.
+
+Perfect timing to automate the nonsense.
+
+Where has AI actually removed work for you, and where has it just upgraded the bureaucracy?
+
+hashtag#AI hashtag#FutureOfWork hashtag#Workplace hashtag#Automation hashtag#Technology hashtag#Leadership
+
+Credit: Ralph
+
+--- linkedin_044 ---
+
+There is an old Silicon Valley warning that the AI industry should probably take more seriously:
+
+“𝗜𝗳 𝘆𝗼𝘂 𝗮𝗿𝗲 𝗼𝗻 𝘁𝗵𝗲 𝘄𝗿𝗼𝗻𝗴 𝗽𝗮𝘁𝗵 𝘁𝗼 𝗔𝗚𝗜, 𝗴𝗲𝘁 𝗼𝗳𝗳 𝗮𝘀 𝘀𝗼𝗼𝗻 𝗮𝘀 𝘆𝗼𝘂 𝗰𝗮𝗻. 𝗧𝗵𝗲 𝗹𝗼𝗻𝗴𝗲𝗿 𝘆𝗼𝘂 𝗯𝗲𝗹𝗶𝗲𝘃𝗲 𝘁𝗵𝗮𝘁 𝘀𝗰𝗮𝗹𝗶𝗻𝗴 𝗹𝗮𝗿𝗴𝗲 𝗹𝗮𝗻𝗴𝘂𝗮𝗴𝗲 𝗺𝗼𝗱𝗲𝗹𝘀 𝘄𝗶𝗹𝗹 𝗴𝗲𝘁 𝘆𝗼𝘂 𝘁𝗵𝗲𝗿𝗲, 𝘁𝗵𝗲 𝗳𝘂𝗿𝘁𝗵𝗲𝗿 𝘆𝗼𝘂 𝗱𝗿𝗶𝗳𝘁 𝗳𝗿𝗼𝗺 𝗔𝗚𝗜, 𝗮𝗻𝗱 𝘁𝗵𝗲 𝗺𝗼𝗿𝗲 𝗲𝘅𝗽𝗲𝗻𝘀𝗶𝘃𝗲 𝘁𝗵𝗲 𝗰𝗼𝘂𝗿𝘀𝗲 𝗰𝗼𝗿𝗿𝗲𝗰𝘁𝗶𝗼𝗻 𝘄𝗶𝗹𝗹 𝗯𝗲.”
+
+And that may be the bigger point.
+
+Not just whether LLM scaling reaches AGI.
+
+But whether the world’s smartest companies are becoming incredibly efficient at going faster in the wrong direction.
+
+hashtag#technology hashtag#ai hashtag#workplace 
+
+Image credit: Ralph
+
+--- linkedin_045 ---
+
+AI just moved from hype… to hard business reality.
+
+I just came back from NVIDIA GTC 2026, and I wrote this article on what truly matters for leaders — not the noise, but the signals.
+
+You’ll discover:
+• Why AI is becoming a cost center you must manage (like electricity)
+• The shift from software… to AI factories producing output at scale
+• What “agentic AI” really means in practice — and why every company needs a strategy now
+• Where AI is already creating massive value (and where most companies are still missing it)
+ • The real bottleneck slowing AI down inside organizations
+
+But also something deeper:
+The companies winning are not the ones with the best AI.
+ They are the ones redesigning how they work around it.
+
+💫 One idea that stayed with me:
+“The future is not built by those who use AI.
+ It is built by those who organize around it.”
+
+I also share a few examples that genuinely changed how I see the next 3 years — especially around robotics, agents, and proprietary data.
+
+👉 Curious: What is the one AI use case your organization should already have deployed?
+
+hashtag#NvidiaAmbassador hashtag#GTC2026 hashtag#AgenticAI hashtag#ArtificialIntelligence hashtag#NVIDIAGTC
+
+--- linkedin_046 ---
+
+A smartphone at MWC26 just challenged how devices should be built.
+
+The modular ATOM phone by Techno introduces a different approach.
+Instead of fixed hardware, it allows components to be adapted, upgraded, or reconfigured.
+
+The shift is clear.
+
+From static products…
+to evolving systems.
+
+This isn’t just about customization.
+It’s about extending the life and function of devices over time.
+
+So here’s the real question:
+
+Will we keep replacing our phones… or start upgrading them like systems?
+
+hashtag#Innovation hashtag#Technology hashtag#Mobile hashtag#FutureOfTech hashtag#MWC26
+
+--- linkedin_047 ---
+
+I wasted months studying the wrong things when I started my AI journey.
+ 
+I thought I needed to:
+ 
+→ Train models from scratch
+→ Master linear algebra and calculus
+→ Write custom neural networks
+→ Compete on Kaggle
+→ Read research papers every week
+ 
+None of that is what an AI Engineer actually does in 2026.
+ 
+Here's what I wish someone had told me earlier.
+ 
+𝗧𝗵𝗲 𝗿𝗼𝗹𝗲 𝗵𝗮𝘀 𝗰𝗼𝗺𝗽𝗹𝗲𝘁𝗲𝗹𝘆 𝘀𝗵𝗶𝗳𝘁𝗲𝗱.
+ 
+The 2026 AI Engineer doesn't build models.
+They orchestrate them.
+ 
+The real skill map looks nothing like what most bootcamps teach:
+ 
+→ Agent orchestration (multi-agent systems, subagents, Agent Teams)
+→ RAG pipelines (vector DBs, embeddings, chunking, hybrid search, GraphRAG)
+→ MCP integrations (connecting AI to real-world tools and APIs)
+→ Prompt engineering as a discipline (systematic, testable, version-controlled)
+→ Multi-model routing (Opus for reasoning, Sonnet for speed, Haiku for cost)
+→ Guardrails and safety (input validation, hallucination detection, human-in-the-loop)
+→ LLMOps (monitoring, evaluation, cost control, caching)
+ 
+This isn't theory. This is what production AI teams actually hire for.
+
+--- linkedin_048 ---
+
+The open-source AI war just exploded.
+
+In the last 72 hours:
+
+→ Google dropped Gemma 4 under Apache 2.0
+→ Alibaba made Qwen 3.6 Plus FREE on OpenRouter
+→ Cursor 3 launched to fight Claude Code
+→ DeepSeek V4 confirmed for this month
+
+This isn't a normal week.
+
+Here's the full scorecard →
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+𝟲 𝗟𝗮𝗯𝘀. 𝟲 𝗠𝗼𝗱𝗲𝗹𝘀. 𝗢𝗻𝗲 𝗪𝗲𝗲𝗸.
+
+𝗚𝗲𝗺𝗺𝗮 𝟰 𝟯𝟭𝗕 (Google)
+→ 89.2% on AIME 2026, 80.0% on LiveCodeBench
+→ Fits on a single 80GB H100
+→ First Gemma under Apache 2.0 — no more custom license friction
+
+𝗚𝗲𝗺𝗺𝗮 𝟰 𝟮𝟲𝗕 𝗠𝗼𝗘 (Google)
+→ 88.3% on AIME with only 3.8B active parameters
+→ Runs on a single 24GB GPU with Q4 quantization
+→ Best intelligence-per-parameter in the open-weight space right now
+
+𝗤𝘄𝗲𝗻 𝟯.𝟲 𝗣𝗹𝘂𝘀 (Alibaba)
+→ 1M token context window
+→ Native function calling + agentic coding focus
+→ FREE on OpenRouter — doing Codex-tier work on real codebases
+
+𝗟𝗹𝗮𝗺𝗮 𝟰 𝗦𝗰𝗼𝘂𝘁 (Meta)
+→ 10M token context window
+→ 17B active / 109B total parameters
+→ Still on Meta's community license (700M MAU threshold)
+
+𝗴𝗽𝘁-𝗼𝘀𝘀-𝟭𝟮𝟬𝗕 (OpenAI)
+→ OpenAI's first open-weight model. Under Apache 2.0.
+→ Yes, you read that right. OpenAI. Open. Apache 2.0.
+
+𝗚𝗟𝗠-𝟱 (Zhipu AI)
+→ Trained entirely on Huawei chips. Zero NVIDIA dependency.
+→ Apache 2.0
+→ A milestone for hardware independence in AI
+
+𝗧𝗵𝗲 𝗥𝗲𝗮𝗹 𝗦𝘁𝗼𝗿𝘆 𝗜𝘀𝗻'𝘁 𝗕𝗲𝗻𝗰𝗵𝗺𝗮𝗿𝗸𝘀. 𝗜𝘁'𝘀 𝗟𝗶𝗰𝗲𝗻𝘀𝗲𝘀.
+
+5 of 6 major open models are now Apache 2.0 or MIT.
+
+No MAU caps. No acceptable-use carve-outs. No legal review friction.
+
+Only Llama 4 still uses a custom community license.
+
+A year ago, "open" came with asterisks. In April 2026, open actually means open.
+
+For enterprise teams that spent months in legal review before deploying open models — that barrier just disappeared.
+
+𝗧𝗵𝗲 𝗖𝗼𝗻𝗻𝗲𝗰𝘁𝗶𝗻𝗴 𝗧𝗵𝗿𝗲𝗮𝗱 𝗔𝗰𝗿𝗼𝘀𝘀 𝗘𝘃𝗲𝗿𝘆 𝗥𝗲𝗹𝗲𝗮𝘀𝗲
+
+Every single release this week is pushing the same direction:
+
+Agents. Not chat.
+
+→ Cursor rebuilt its entire UI around managing agent fleets
+→ Gemma 4 wants agents running locally on your phone
+→ Qwen ships with native function calling and agentic coding as a headline feature
+→ Claude Code has Agent Teams for multi-agent orchestration
+
+A year ago, "AI coding" meant autocomplete and chat sidebars.
+
+Now it means deploying autonomous agents across repos while a free model finds real bugs in your code.
+
+𝗤𝘂𝗶𝗰𝗸 𝗗𝗲𝗰𝗶𝘀𝗶𝗼𝗻 𝗙𝗿𝗮𝗺𝗲𝘄𝗼𝗿𝗸
+
+→ Need edge/mobile? Gemma 4 E2B (runs on 4GB RAM)
+→ Need massive context? Qwen 3.6 Plus (1M tokens, free right now)
+→ Need max reasoning? Gemma 4 31B (89.2% AIME)
+→ Need cost efficiency? Gemma 4 26B MoE (3.8B active params, 24GB GPU)
+→ Need hardware independence? GLM-5 (zero NVIDIA)
+
+The gap between frontier and free is narrowing faster than anyone predicted.
+
+Open-source is no longer a compromise. It's a competitive advantage.
+
+What's your take — are open models ready to replace proprietary APIs for your production use case?
+
+--- linkedin_049 ---
+
+𝗖𝗹𝗮𝘂𝗱𝗲 𝗖𝗼𝗱𝗲 is a full agent development framework.
+Most people drop a CLAUDE. md file and call it a day.
+
+That's like using 1 out of 6 gears.
+Here's the complete architecture most people are missing:
+—
+𝗟𝗮𝘆𝗲𝗿 𝟭: 𝗠𝗲𝗺𝗼𝗿𝘆
+→ CLAUDE. md = team instructions, committed to git 
+→ CLAUDE. local. md = your personal overrides, gitignored 
+→ rules/ = modular always-on instruction files
+This is what Claude reads every single session. Non-negotiable context.
+
+𝗟𝗮𝘆𝗲𝗿 𝟮: 𝗦𝗸𝗶𝗹𝗹𝘀
+→ Each skill lives in its own folder with a SKILL. md file 
+→ Claude auto-invokes them based on semantic matching 
+→ Skills can carry references/, scripts/, and examples/ 
+→ Think of it as on-demand domain expertise
+Skills are probabilistic. Claude decides when to use them.
+
+𝗟𝗮𝘆𝗲𝗿 𝟯: 𝗛𝗼𝗼𝗸𝘀
+→ Shell scripts triggered by events like PreToolUse, PostToolUse, SessionStart → block-force-push. sh blocks dangerous git commands 
+→ auto-lint. sh runs after every file edit 
+→ 17 hook events available
+Hooks are deterministic. They run 100% of the time. No exceptions.
+
+𝗟𝗮𝘆𝗲𝗿 𝟰: 𝗔𝗴𝗲𝗻𝘁𝘀
+→ Subagents get their own isolated context window 
+→ code-reviewer. md, security-auditor. md, qa-tester. md 
+→ 3 built-in agents: Explore, Plan, Task 
+→ They run in parallel without polluting your main conversation
+
+𝗟𝗮𝘆𝗲𝗿 𝟱: 𝗣𝗹𝘂𝗴𝗶𝗻𝘀
+→ Bundle skills + agents + hooks into one distributable package 
+→ Install via /plugins → Namespaced to avoid conflicts 
+→ Share your entire workflow with your team in one command
+
+𝗟𝗮𝘆𝗲𝗿 𝟲: 𝗠𝗖𝗣
+→ .mcp. json connects Claude to external tools 
+→ GitHub, Jira, databases, APIs 
+→ The bridge between Claude and everything else
+—
+
+The critical insight most people miss:
+𝗖𝗟𝗔𝗨𝗗𝗘. 𝗺𝗱 + 𝗛𝗼𝗼𝗸𝘀 = 𝗱𝗲𝘁𝗲𝗿𝗺𝗶𝗻𝗶𝘀𝘁𝗶𝗰 (runs every time) 𝗦𝗸𝗶𝗹𝗹𝘀 + 𝗔𝗴𝗲𝗻𝘁𝘀 = 𝗽𝗿𝗼𝗯𝗮𝗯𝗶𝗹𝗶𝘀𝘁𝗶𝗰 (Claude decides)
+
+Understanding this distinction drives every architecture decision.
+
+I created a complete visual breakdown of the project structure showing all 6 layers (see image below).
+
+Save this. You'll reference it constantly.
+
+--- linkedin_050 ---
+
+This repo killed the biggest time-waster in Claude Code overnight. 
+
+Claude Code is powerful but forgetful. 
+
+Every session starts from zero. 
+
+Same stack explanation. Same tool setup. Same context window.
+
+A new open-source repo changes that.
+
+It ships pre-built agents, memory, and reusable skills for any project. 
+
+The repo includes production-ready agents that run without supervision. 
+
+Pre-built commands turn a single prompt into a coordinated engineering workflow.
+
+What it bundles:
+
+> Session memory that never resets
+> Auto-triggered workflow hooks
+> Portable skills across projects
+> Autonomous agent templates
+> One-prompt engineering commands
+
+Everything here was possible before, manually. 
+
+This packages it into one install. 
+
+Fully open source on GitHub. 
+
+Link in comments.
+↓
+Check out AlphaSignal.ai to get a daily summary of top models, repos, and papers in AI. Read by 280,000+ devs.
+
+--- linkedin_051 ---
+
+We keep saying "human in the loop" like it's a safeguard. But is it?
+
+A post from Christopher Grady has me thinking this morning. Research shows that people are no better than a coin flip at identifying AI-generated content, and they're often overconfident in their ability to do so. If that's the baseline, what does it mean to put a human "in the loop" of an AI process? 
+
+There's a real difference between a nominal human in the loop and a meaningful one. A human in the loop is only as effective a validator as their ability to recognize what they're actually evaluating. And right now, we may be handing people that responsibility without giving them the skills or tools to serve as a credible check on AI output.
+
+This is a real challenge — and a real opportunity — for learning professionals. As organizations rush to embed AI into their workflows, we can be asking some pointed questions:
+
+→ What does it actually take to be an effective validator of AI output?
+→ Are we training people to evaluate AI critically, or just rubber-stamp it?
+→ Are we designing the interfaces and processes that make meaningful human review possible?
+
+On that last point: At TorranceLearning, we've been working on MAdge, a tool designed to give SMEs and evaluators a structured interface for assessing AI-generated content. The right tools matter. The right training matters. Without both, "human in the loop" can become a false assurance.
+
+I'd love to hear from others: How are YOU equipping your humans in the loop? What does good look like in your organization?
+
+Bonus points: Is this image synthetic or authentic? 
+
+(Links to Chris's post and the MAdge article in the comments)
+
+#HumanInTheLoop #AIGovernance #LearningAndDevelopment #InstructionalDesign #AILiteracy
+
+--- linkedin_052 ---
+
+The first episode of Human, in the Loop Podcast is LIVE!
+
+Anslem Elumogo-Gardner, MBA and I sat down with Christian Perry to discuss: who is AI actually working for?  Power, policy, the wealth gap, and what this means for the people closest to the work. Proud to be part of this conversation and the work of Mind for Mission to enable local businesses and mission-driven organizations to modernize how they operate.  
+
+How are you engaging with AI as a human, as an employee, as a worker?  Let us know!
+
+#HumanInTheLoop #AI #MindForMission #AIforGood #ResponsibleAI #ResponsibleTech #FutureProofingSocialGood
+
+https://lnkd.in/gtyX4st9
+
+Human in the Loop: Christian Perry: Who is AI Working For | Power, Wealth, and Who Gets Left Behind
+
